@@ -1,18 +1,69 @@
 [submodule "third_party/vllm"]
 	path = third_party/vllm
 	url = https://github.com/vllm-project/vllm.git
+[submodule "third_party/pytorch"]
+	path = third_party/pytorch
+	url = https://github.com/pytorch/pytorch.git
+[submodule "third_party/torch-mlir"]
+	path = third_party/torch-mlir
+	url = https://github.com/llvm/torch-mlir.git
 [submodule "huawei/third_party/vllm-ascend"]
 	path = huawei/third_party/vllm-ascend
 	url = https://github.com/vllm-project/vllm-ascend.git
+[submodule "huawei/third_party/torch_npu"]
+	path = huawei/third_party/torch_npu
+	url = https://github.com/Ascend/pytorch.git
+[submodule "huawei/third_party/op-plugin"]
+	path = huawei/third_party/op-plugin
+	url = https://gitcode.com/Ascend/op-plugin.git
+[submodule "huawei/third_party/torchair"]
+	path = huawei/third_party/torchair
+	url = https://gitcode.com/Ascend/torchair.git
+[submodule "huawei/third_party/runtime"]
+	path = huawei/third_party/runtime
+	url = https://gitcode.com/cann/runtime.git
+[submodule "huawei/third_party/driver"]
+	path = huawei/third_party/driver
+	url = https://gitcode.com/cann/driver.git
 [submodule "qualcomm/third_party/vllm-qaic"]
 	path = qualcomm/third_party/vllm-qaic
 	url = https://github.com/qualcomm/vllm-qaic.git
+[submodule "qualcomm/third_party/efficient-transformers"]
+	path = qualcomm/third_party/efficient-transformers
+	url = https://github.com/quic/efficient-transformers.git
+[submodule "qualcomm/third_party/cloud-ai-sdk"]
+	path = qualcomm/third_party/cloud-ai-sdk
+	url = https://github.com/quic/cloud-ai-sdk.git
 [submodule "tenstorrent/third_party/vllm-tt-plugin"]
 	path = tenstorrent/third_party/vllm-tt-plugin
 	url = https://github.com/tenstorrent/vllm-tt-plugin.git
 [submodule "tenstorrent/third_party/tt-metal"]
 	path = tenstorrent/third_party/tt-metal
 	url = https://github.com/tenstorrent/tt-metal.git
+[submodule "tenstorrent/third_party/tt-mlir"]
+	path = tenstorrent/third_party/tt-mlir
+	url = https://github.com/tenstorrent/tt-mlir.git
+[submodule "tenstorrent/third_party/tt-xla"]
+	path = tenstorrent/third_party/tt-xla
+	url = https://github.com/tenstorrent/tt-xla.git
+[submodule "tenstorrent/third_party/tt-umd"]
+	path = tenstorrent/third_party/tt-umd
+	url = https://github.com/tenstorrent/tt-umd.git
+[submodule "tenstorrent/third_party/tt-kmd"]
+	path = tenstorrent/third_party/tt-kmd
+	url = https://github.com/tenstorrent/tt-kmd.git
 [submodule "google/third_party/tpu-inference"]
 	path = google/third_party/tpu-inference
 	url = https://github.com/vllm-project/tpu-inference.git
+[submodule "google/third_party/xla"]
+	path = google/third_party/xla
+	url = https://github.com/openxla/xla.git
+[submodule "google/third_party/jax"]
+	path = google/third_party/jax
+	url = https://github.com/jax-ml/jax.git
+[submodule "google/third_party/jetstream"]
+	path = google/third_party/jetstream
+	url = https://github.com/AI-Hypercomputer/JetStream.git
+[submodule "google/third_party/jetstream-pytorch"]
+	path = google/third_party/jetstream-pytorch
+	url = https://github.com/AI-Hypercomputer/jetstream-pytorch.git
