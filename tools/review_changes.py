@@ -77,11 +77,32 @@ def get_git_diff_files(repo_full_path, base_sha, target_sha):
     for l in lines:
         if not l.strip():
             continue
-        parts = l.split(maxsplit=1)
-        if len(parts) == 2:
+        # git diff --name-status 格式：
+        # 普通修改/新增/删除: "M\tpath" 或 "A\tpath" 或 "D\tpath"
+        # 重命名/拷贝: "R100\told_path\tnew_path" 或 "C100\tsrc\tdst"
+        parts = l.split("\t")
+        if len(parts) == 1:
+            # 兼容非 tab 分隔的极简情况
+            parts = l.split()
+        if len(parts) >= 3 and (parts[0].startswith("R") or parts[0].startswith("C")):
+            status = parts[0]
+            old_path = parts[1].strip()
+            new_path = parts[2].strip()
+            changes.append({
+                "status": status,
+                "path": new_path,
+                "old_path": old_path,
+                "is_rename": True
+            })
+        elif len(parts) >= 2:
             status = parts[0]
             file_path = parts[1].strip()
-            changes.append((status, file_path))
+            changes.append({
+                "status": status,
+                "path": file_path,
+                "old_path": None,
+                "is_rename": False
+            })
     return changes
 
 def get_commit_logs(repo_full_path, base_sha, target_sha):
@@ -137,47 +158,64 @@ def main():
         sys.exit(0)
 
     print("\n【1. 改动文件列表 (Changed Files)】")
-    for status, fp in changed_files[:25]:
-        print(f"  [{status}] {fp}")
+    for item in changed_files[:25]:
+        if item["is_rename"]:
+            print(f"  [{item['status']}] {item['old_path']} -> {item['path']}")
+        else:
+            print(f"  [{item['status']}] {item['path']}")
     if len(changed_files) > 25:
         print(f"  ... 另有 {len(changed_files) - 25} 个改动文件未完全展开")
 
     print("\n【2. 注册 Claim 候选波及分析 (Candidate Assessment)】")
-    covered_files = set()
+    covered_items = set()
     candidate_hits = []
 
     for c in claims:
         cid = c["claim_id"]
         pattern = c.get("affected_path_glob", "*")
-        hit_files = []
-        for status, fp in changed_files:
-            if fnmatch.fnmatch(fp, pattern):
-                hit_files.append((status, fp))
-                covered_files.add(fp)
+        hit_details = []
+        for item in changed_files:
+            # 无论旧路径还是新路径，只要任一命中 glob 模式即判定波及
+            matched_path = None
+            if fnmatch.fnmatch(item["path"], pattern):
+                matched_path = item["path"]
+            elif item["old_path"] and fnmatch.fnmatch(item["old_path"], pattern):
+                matched_path = f"{item['old_path']} -> {item['path']}"
 
-        if hit_files:
-            candidate_hits.append((c, hit_files))
+            if matched_path:
+                hit_details.append((item["status"], matched_path))
+                covered_items.add(item["path"])
+                if item["old_path"]:
+                    covered_items.add(item["old_path"])
+
+        if hit_details:
+            candidate_hits.append((c, hit_details))
             print(f"\n⚡ [CANDIDATE AFFECTED] {cid}")
             print(f"   陈述: {c['statement']}")
             print(f"   符号/锚点: {c.get('symbol')} (文件: {c.get('file_path')})")
             print(f"   调用链: {c.get('caller_chain')}")
             print(f"   Owner 文档: {c.get('owner_doc')}")
-            print(f"   匹配改动文件 ({len(hit_files)} 个):")
-            for s, hf in hit_files[:5]:
+            print(f"   匹配改动文件 ({len(hit_details)} 个):")
+            for s, hf in hit_details[:5]:
                 print(f"     - [{s}] {hf}")
-            if len(hit_files) > 5:
-                print(f"     - ... 另有 {len(hit_files) - 5} 个文件匹配")
+            if len(hit_details) > 5:
+                print(f"     - ... 另有 {len(hit_details) - 5} 个文件匹配")
             print("   -> 判定: NEEDS_MANUAL_REVIEW (需人工追踪符号 diff 与调用链是否破坏)")
         else:
             print(f"✓ [UNCHANGED-BY-PATH] {cid}: 相关路径无改动")
 
     # 统计未被 Claim 索引覆盖的改动文件
-    uncovered_files = [fp for status, fp in changed_files if fp not in covered_files]
+    uncovered_files = []
+    for item in changed_files:
+        if item["path"] not in covered_items and (not item["old_path"] or item["old_path"] not in covered_items):
+            desc = f"{item['old_path']} -> {item['path']}" if item["is_rename"] else item["path"]
+            uncovered_files.append((item["status"], desc))
+
     print("\n【3. 未覆盖改动统计 (Uncovered by Claims Index)】")
     if uncovered_files:
-        print(f"  提示：存在 {len(uncovered_files)} 个改动文件未被当前 Claim 索引覆盖。")
-        for u in uncovered_files[:10]:
-            print(f"   - [UNCOVERED] {u}")
+        print(f"  提示：存在 {len(uncovered_files)} 个改动记录未被当前 Claim 索引覆盖。")
+        for s, u in uncovered_files[:10]:
+            print(f"   - [UNCOVERED] [{s}] {u}")
         if len(uncovered_files) > 10:
             print(f"   - ... 另有 {len(uncovered_files) - 10} 个文件未覆盖")
     else:

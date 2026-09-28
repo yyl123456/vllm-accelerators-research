@@ -224,7 +224,8 @@ def check_claims_index():
             print(f"  [FAIL] {cid} owner_doc 不存在: {owner}")
             return False
 
-    print(f"  -> {len(claims)} 条 Claim 的模式、唯一 ID、枚举、源码文件、符号、Caller 及 Owner 文档全部验证通过 PASS")
+    print(f"  -> {len(claims)} 条 Claim 的模式、唯一 ID、枚举、源码文件存在性、符号字符串与 Caller 字段初检全部通过 PASS")
+    print("     [注] 本校验仅确认文件存在、符号字符串包含及 Caller 字段格式非空，不代表全量 AST 级可达性或运行时证明。")
     return True
 
 def main():
