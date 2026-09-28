@@ -27,9 +27,21 @@
 
 ---
 
-## 六大固定源码 Revision 与只读隔离
+## 协作者与 Agent 克隆指引（Git Submodules）
 
-为确保所有技术分析与代码行号可核查、可复现，本工作区将源码严格绑定为以下 6 个固定 Commit SHA（详见 [`20260903-150-源码Revision与权威资料索引.md`](./20260903-vllm-ai-infra-research/15-evidence-review/20260903-150-源码Revision与权威资料索引.md)）：
+本工作区通过 `.gitmodules` 声明并锁定了 6 大核心第三方源码仓库，作为只读审查与证据追踪的锚点。
+
+### 1. 完整拉取（含 Submodules）
+外部协作者或新环境初始化时，建议运行：
+```bash
+# 克隆主仓库并自动递归检出所有绑定的第三方仓库固定 Commit SHA
+git clone --recurse-submodules <本仓库URL>
+
+# 或在已有仓库下初始化并更新子模块
+git submodule update --init --recursive
+```
+
+### 2. 六大固定源码 Revision
 
 | 仓库 | 相对路径 | 固定 SHA | 角色与用途 |
 |---|---|---|---|
@@ -40,7 +52,7 @@
 | **TT-Metal** | `tenstorrent/third_party/tt-metal/` | `c634b1ca4c10eea5037d80767ce5f9e2912a401f` | Tenstorrent 底层编程模型、Tensix 计算内核与 CommandQueue |
 | **TPU Inference** | `google/third_party/tpu-inference/` | `fd33800041510b957cd2da6199742cce2b5fd113` | Google TPU vLLM 适配、XLA 编译缓存与 Shape 分桶 |
 
-> **只读隔离铁律**：所有 `third_party/` 目录均被 `.gitignore` 排除，仅作为只读对照基线。严禁直接修改或在第三方仓库中产生未提交改动。
+> **只读隔离铁律**：所有子模块目录仅作为只读对照基线。严禁直接在子模块中修改代码或产生未提交改动。
 
 ---
 
@@ -75,10 +87,25 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 
 ---
 
+## Agent 工具防错与避坑规则（系统级稳定性）
+
+在多轮自动化工具调用或复杂长任务中，为避免工具层抛出异常导致流程挂起或中断，所有在本项目工作的 Agent 必须严格遵守以下执行纪律：
+
+1. **文件读写顺序（Read-Before-Write/Edit）**：
+   - 在调用 `edit` 或覆盖写入 `write` 任何现有文件之前，**必须先通过 `read` 工具读取该文件**。禁止凭借历史记忆直接编辑未读取文件，否则会触发系统文件观察策略拦截。
+2. **权限参数规范（No Invalid Justification Escalation）**：
+   - `justification` 参数**仅且必须**与 `sandbox_permissions`（权限提权申请）成对出现。
+   - 在常规 `workspace-write` 许可范围内的标准 `edit`/`write` 操作中，**严禁多余传递 `justification` 参数**，否则会导致系统报错 `invalid escalation: justification is only valid together with sandbox_permissions` 并可能导致交互卡顿。
+3. **报错自愈与连续执行**：
+   - 若遇到工具报错（如路径错误、内容匹配差异），**严禁停止响应等待用户催促**，必须在同一轮次中立即重新 `read`、校准参数并重试，维持任务连续推进。
+
+---
+
 ## 工作区目录结构说明
 
 ```text
 .
+├── .gitmodules                          # 6 大核心第三方仓库 Submodule 映射清单
 ├── .gitignore                           # 已配置忽略所有 third_party 目录及临时缓存
 ├── AGENTS.md                            # 全局规范与核心调研指引（唯一全局入口）
 ├── 20260903-vllm-ai-infra-research/     # 【核心唯一权威库】精确 105 篇全景研究文档
@@ -92,24 +119,24 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 ├── analysis-design/                     # 历史分析设计文档与运行时接口参考（过渡补充）
 ├── tools/                               # 本地轻量静态校验与增量变更复核脚本
 │
-├── third_party/                         # 【通用第三方框架，.gitignore 忽略】
+├── third_party/                         # 【通用第三方框架，Submodule 管理】
 │   └── vllm/                            #   - 上游 vLLM (SHA: bb363db9)
 │
 ├── huawei/                              # 【Huawei Ascend 路线】
 │   ├── docs/                            #   - 华为调研文档 (aot, capture-eager, comm)
-│   └── third_party/vllm-ascend/         #   - 华为适配代码 (SHA: 35463578)
+│   └── third_party/vllm-ascend/         #   - 华为适配代码 Submodule (SHA: 35463578)
 │
 ├── qualcomm/                            # 【Qualcomm Cloud AI 路线】
 │   ├── docs/                            #   - 高通调研文档 (aot, capture-eager, comm)
-│   └── third_party/vllm-qaic/           #   - 高通适配代码 (SHA: 3212cc67)
+│   └── third_party/vllm-qaic/           #   - 高通适配代码 Submodule (SHA: 3212cc67)
 │
 ├── tenstorrent/                         # 【Tenstorrent 路线】
 │   ├── docs/                            #   - TT 调研文档 (aot, capture-eager, comm)
-│   └── third_party/                     #   - TT 适配代码 (vllm-tt-plugin: f6995475, tt-metal: c634b1ca)
+│   └── third_party/                     #   - TT 适配代码 Submodules (vllm-tt-plugin: f6995475, tt-metal: c634b1ca)
 │
 └── google/                              # 【Google TPU / XLA 路线】
     ├── docs/                            #   - 谷歌调研文档 (aot, capture-eager, comm)
-    └── third_party/                     #   - 谷歌适配代码 (tpu-inference: fd338000 等)
+    └── third_party/                     #   - 谷歌适配代码 Submodule (tpu-inference: fd338000)
 ```
 
 ---

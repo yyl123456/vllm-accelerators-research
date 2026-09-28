@@ -1,11 +1,22 @@
 # Git ignore rules for open-source research workspace
 
-# 1. 忽略所有第三方大仓库（避免开源提交外部源码）
-third_party/
-huawei/third_party/
-qualcomm/third_party/
-google/third_party/
-tenstorrent/third_party/
+# 1. 忽略所有非 Submodule 的第三方目录（只留 6 个官方 submodule）
+# 保持对 6 个官方 Submodule 路径的追踪：
+third_party/*
+!third_party/vllm/
+
+huawei/third_party/*
+!huawei/third_party/vllm-ascend/
+
+qualcomm/third_party/*
+!qualcomm/third_party/vllm-qaic/
+
+tenstorrent/third_party/*
+!tenstorrent/third_party/vllm-tt-plugin/
+!tenstorrent/third_party/tt-metal/
+
+google/third_party/*
+!google/third_party/tpu-inference/
 
 # 2. Python 缓存与临时文件
 __pycache__/

@@ -1,0 +1,18 @@
+[submodule "third_party/vllm"]
+	path = third_party/vllm
+	url = https://github.com/vllm-project/vllm.git
+[submodule "huawei/third_party/vllm-ascend"]
+	path = huawei/third_party/vllm-ascend
+	url = https://github.com/vllm-project/vllm-ascend.git
+[submodule "qualcomm/third_party/vllm-qaic"]
+	path = qualcomm/third_party/vllm-qaic
+	url = https://github.com/qualcomm/vllm-qaic.git
+[submodule "tenstorrent/third_party/vllm-tt-plugin"]
+	path = tenstorrent/third_party/vllm-tt-plugin
+	url = https://github.com/tenstorrent/vllm-tt-plugin.git
+[submodule "tenstorrent/third_party/tt-metal"]
+	path = tenstorrent/third_party/tt-metal
+	url = https://github.com/tenstorrent/tt-metal.git
+[submodule "google/third_party/tpu-inference"]
+	path = google/third_party/tpu-inference
+	url = https://github.com/vllm-project/tpu-inference.git
