@@ -1,0 +1,488 @@
+[
+  {
+    "id": "S1",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/setup.py",
+    "start": 313,
+    "end": 316,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/setup.py#L313-L316"
+  },
+  {
+    "id": "S1",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/__init__.py",
+    "start": 32,
+    "end": 39,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/__init__.py#L32-L39"
+  },
+  {
+    "id": "S2",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 48,
+    "end": 71,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/platform_base.py#L48-L71"
+  },
+  {
+    "id": "S2",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 326,
+    "end": 386,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L326-L386"
+  },
+  {
+    "id": "S3",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/scripts/install.sh",
+    "start": 160,
+    "end": 173,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/scripts/install.sh#L160-L173"
+  },
+  {
+    "id": "S3",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/scripts/install.sh",
+    "start": 211,
+    "end": 226,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/scripts/install.sh#L211-L226"
+  },
+  {
+    "id": "S3",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/requirements/pyt.txt",
+    "start": 1,
+    "end": 8,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/requirements/pyt.txt#L1-L8"
+  },
+  {
+    "id": "S4",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 248,
+    "end": 256,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/platform_base.py#L248-L256"
+  },
+  {
+    "id": "S4",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 282,
+    "end": 313,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/platform_base.py#L282-L313"
+  },
+  {
+    "id": "S4",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 387,
+    "end": 409,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/platform_base.py#L387-L409"
+  },
+  {
+    "id": "S5",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1364,
+    "end": 1369,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L1364-L1369"
+  },
+  {
+    "id": "S5",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1398,
+    "end": 1424,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L1398-L1424"
+  },
+  {
+    "id": "S5",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1505,
+    "end": 1511,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L1505-L1511"
+  },
+  {
+    "id": "S5",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1556,
+    "end": 1579,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L1556-L1579"
+  },
+  {
+    "id": "S6",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 63,
+    "end": 114,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic_session_np.py#L63-L114"
+  },
+  {
+    "id": "S6",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 123,
+    "end": 228,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic_session_np.py#L123-L228"
+  },
+  {
+    "id": "S6",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 416,
+    "end": 426,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic_session_np.py#L416-L426"
+  },
+  {
+    "id": "S6",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 542,
+    "end": 583,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic_session_np.py#L542-L583"
+  },
+  {
+    "id": "S6",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 628,
+    "end": 663,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic_session_np.py#L628-L663"
+  },
+  {
+    "id": "S7",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 773,
+    "end": 777,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L773-L777"
+  },
+  {
+    "id": "S7",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 814,
+    "end": 816,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L814-L816"
+  },
+  {
+    "id": "S7",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1055,
+    "end": 1115,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1055-L1115"
+  },
+  {
+    "id": "S7",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1218,
+    "end": 1276,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1218-L1276"
+  },
+  {
+    "id": "S8",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 208,
+    "end": 273,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L208-L273"
+  },
+  {
+    "id": "S8",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 707,
+    "end": 738,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L707-L738"
+  },
+  {
+    "id": "S8",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 759,
+    "end": 824,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L759-L824"
+  },
+  {
+    "id": "S8",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 828,
+    "end": 895,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/model_loader/qaic.py#L828-L895"
+  },
+  {
+    "id": "S9",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 240,
+    "end": 282,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L240-L282"
+  },
+  {
+    "id": "S9",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 944,
+    "end": 955,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L944-L955"
+  },
+  {
+    "id": "S9",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1329,
+    "end": 1410,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1329-L1410"
+  },
+  {
+    "id": "S9",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1447,
+    "end": 1461,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1447-L1461"
+  },
+  {
+    "id": "S10",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 632,
+    "end": 645,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L632-L645"
+  },
+  {
+    "id": "S10",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 704,
+    "end": 771,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L704-L771"
+  },
+  {
+    "id": "S10",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1780,
+    "end": 1810,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1780-L1810"
+  },
+  {
+    "id": "S11",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/base/modeling_qeff.py",
+    "start": 450,
+    "end": 483,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/base/modeling_qeff.py#L450-L483"
+  },
+  {
+    "id": "S11",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/base/modeling_qeff.py",
+    "start": 1165,
+    "end": 1179,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/base/modeling_qeff.py#L1165-L1179"
+  },
+  {
+    "id": "S11",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/base/modeling_qeff.py",
+    "start": 1216,
+    "end": 1343,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/base/modeling_qeff.py#L1216-L1343"
+  },
+  {
+    "id": "S11",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/utils/constants.py",
+    "start": 124,
+    "end": 124,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/utils/constants.py#L124-L124"
+  },
+  {
+    "id": "S12",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/transformers/cache_utils.py",
+    "start": 450,
+    "end": 481,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/transformers/cache_utils.py#L450-L481"
+  },
+  {
+    "id": "S12",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/transformers/cache_utils.py",
+    "start": 546,
+    "end": 573,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/transformers/cache_utils.py#L546-L573"
+  },
+  {
+    "id": "S12",
+    "repo": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/transformers/models/modeling_auto.py",
+    "start": 3046,
+    "end": 3068,
+    "url": "https://github.com/quic/efficient-transformers/blob/e127a6b741d8b71e81134cc76c7e24cea7210cdc/QEfficient/transformers/models/modeling_auto.py#L3046-L3068"
+  },
+  {
+    "id": "S12",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/attention/backends/qaic_attn.py",
+    "start": 300,
+    "end": 326,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/attention/backends/qaic_attn.py#L300-L326"
+  },
+  {
+    "id": "S12",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/attention/backends/qaic_attn.py",
+    "start": 337,
+    "end": 451,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/attention/backends/qaic_attn.py#L337-L451"
+  },
+  {
+    "id": "S13",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 251,
+    "end": 338,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L251-L338"
+  },
+  {
+    "id": "S13",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 342,
+    "end": 407,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L342-L407"
+  },
+  {
+    "id": "S13",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 481,
+    "end": 488,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/worker.py#L481-L488"
+  },
+  {
+    "id": "S13",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1956,
+    "end": 1966,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/worker/model_runner.py#L1956-L1966"
+  },
+  {
+    "id": "S13",
+    "repo": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "local_path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/distributed/communicator.py",
+    "start": 6,
+    "end": 17,
+    "url": "https://github.com/qualcomm/vllm-qaic/blob/3212cc670130b7e5290b429f781dc978d7ecf430/vllm_qaic/distributed/communicator.py#L6-L17"
+  },
+  {
+    "id": "S14",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/core/src/QExecObj.cpp",
+    "start": 183,
+    "end": 246,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/core/src/QExecObj.cpp#L183-L246"
+  },
+  {
+    "id": "S14",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/core/src/QExecObj.cpp",
+    "start": 280,
+    "end": 311,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/core/src/QExecObj.cpp#L280-L311"
+  },
+  {
+    "id": "S15",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/network-driver/src/QNeuralNetwork.cpp",
+    "start": 473,
+    "end": 529,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/network-driver/src/QNeuralNetwork.cpp#L473-L529"
+  },
+  {
+    "id": "S15",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/network-driver/src/QNeuralNetwork.cpp",
+    "start": 612,
+    "end": 628,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/network-driver/src/QNeuralNetwork.cpp#L612-L628"
+  },
+  {
+    "id": "S16",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/runtime-platform/src/dev/aic100/QRuntimePlatformDeviceAic100.cpp",
+    "start": 71,
+    "end": 148,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/runtime-platform/src/dev/aic100/QRuntimePlatformDeviceAic100.cpp#L71-L148"
+  },
+  {
+    "id": "S16",
+    "repo": "quic/software-kit-for-qualcomm-cloud-ai-100",
+    "commit": "c9479bedd44a1fdca6833462b2a3e20836390e9c",
+    "local_path": "/tmp/qaic-runtime-research-20260922/lib/runtime-platform/src/os/linux/QOsal.cpp",
+    "start": 490,
+    "end": 508,
+    "url": "https://github.com/quic/software-kit-for-qualcomm-cloud-ai-100/blob/c9479bedd44a1fdca6833462b2a3e20836390e9c/lib/runtime-platform/src/os/linux/QOsal.cpp#L490-L508"
+  }
+]

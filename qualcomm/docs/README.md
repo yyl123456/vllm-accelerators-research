@@ -1,0 +1,41 @@
+# 高通 Cloud AI (QAIC) 调研现状与知识库
+
+> **资料角色声明**：
+> 本目录归档高通 Cloud AI 100 / Ultra 服务端 LLM 推理软件栈的技术调研。
+> **权威文档关系**：高通 QAIC 路线的唯一权威结论集合为 [`../../20260903-vllm-ai-infra-research/11-qaic/`](../../20260903-vllm-ai-infra-research/11-qaic/)（文档编号 `20260903-110` ~ `116`）。
+> **固定源码 Revision**：`qualcomm/third_party/vllm-qaic/` 严格锁定为 `3212cc670130b7e5290b429f781dc978d7ecf430`。
+
+高通方案在业内非常典型：**在同一个平台入口（`vllm-qaic`）下，并存着 AOT 静态编译与 PyTorch Eager/解析执行 两条截然不同的执行路线**。
+
+---
+
+## 路线子目录说明与权威对应
+
+- **`aot/`**：**AOT 静态编译路线**
+  - **核心链路**：PyTorch / Transformers → `QEfficient` 模型转换/优化与 ONNX 导出 → QAIC 编译器生成 QPC 二进制包 → Runtime（`qaicrt`）加载并在设备执行。
+  - **调度与内存**：采用多档位 Shape Bucketing；静态分配固定缓冲区；绕过 PyTorch 算子下发。
+  - **对应权威 Owner**：`20260903-114` (QAIC-AoT-QPC-Artifact 与 Profile)、`20260903-115` (QAIC 调度与 Batch)。
+- **`capture-eager/`**：**解析执行与动态图（PYT）路线**
+  - **核心链路**：PyTorch 保持模型定义 → `torch-qaic` 提供 `qaic` 设备后端（PrivateUse1 / C++ Dispatcher）与设备张量 → 逐算子派发或图捕获/JIT 运行时执行。
+  - **调度与内存**：支持标准 PagedAttention 与动态 KV 映射。
+  - **对应权威 Owner**：`20260903-113` (QAIC-Eager 执行、KV 与特性边界)。
+- **`comm/`**：**通用基础设施与公共契约**
+  - 覆盖 Cloud AI 100/Ultra 硬件规格（NSP 算力核、片上 SRAM/DDR、PCIe 拓扑）、`vllm-qaic` 平台初始化与两路线切换机制（`platform_base.py` 根据 `torch_qaic` 包存在与否决定）、QAIC SDK 驱动与版本兼容矩阵。
+  - **对应权威 Owner**：`20260903-110` (硬件与通信)、`20260903-111` (SDK 与软件栈)、`20260903-112` (Platform 与 ModeSelection)、`20260903-116` (版本 Tuple 与验证)。
+
+---
+
+## 调研现状：已证实事实 vs 显式空缺
+
+为确保技术分析不建立在错误或臆测的基础上，特此明确当前调研的证据边界：
+
+### 1. 已证实事实（基于开源源码与 SDK 公开文档）
+- [x] **平台路线判定机制**：`vllm-qaic` 的 `platform_base.py` 并不单纯依据 `--enforce-eager`，而是优先根据环境中是否导入了 `torch_qaic` 模块来选择 `QaicWorkerAoT` 还是 `QaicWorkerPyt`（权威证据：`20260903-112`，等级：`SOURCE_IMPLEMENTED × STATIC_REVIEWED`）。
+- [x] **AoT 运行生命周期**：已完整追踪 `vllm-qaic/vllm_qaic/worker/worker_aot.py` 与 `model_runner_aot.py`；证实其输入张量经由 CPU/NumPy 组织并直接调用 `qaicrt.Context` / `Program` 下发执行（权威证据：`20260903-114`，等级：`SOURCE_IMPLEMENTED × STATIC_REVIEWED`）。
+- [x] **QPC 产物契约**：证实 QPC 是编译后的静态二进制包，内含静态 shape 限制及绑定的固定 buffer 描述符（权威证据：`20260903-114`，等级：`VENDOR_CLAIM × UNVALIDATED`）。
+
+### 2. 显式空缺与未决问题（待调研项 / UNKNOWN）
+- [ ] **【空缺 1】`torch-qaic` 内部 C++ / Dispatcher 实现缺失**：目前 `torch-qaic` 仅有二进制 wheel 包与外部 Python 接口调用证据，其 C++ 层的算子注册表、私有 Allocator 算法与 Stream/Event 实现源码闭源，底层如何将 PyTorch 算子映射至设备尚缺源码级证据（标记为 `UNKNOWN`，证据等级：`VENDOR_CLAIM × UNVALIDATED`）。
+- [ ] **【空缺 2】PYT 路线底层是否存在 Graph Capture / JIT 融合**：官方文档提及 JIT runtime，但缺乏底层是将每个 ATen 算子独立启动（Eager），还是在底层默默执行类似 CUDA Graph / 子图编译重放的直接证据（标记为 `UNKNOWN`）。
+- [ ] **【空缺 3】NSP 之间的通信原语实现**：多卡/多芯片间的分布式并行（如 Tensor Parallelism）在底层走 PCIe 还是专有 CCL 库，具体的 Collective 通信实现细节待核实（标记为 `UNKNOWN`）。
+- [ ] **【空缺 4】真实物理卡实测指标**：在未实际挂载 Cloud AI 100/Ultra 硬件卡的环境下，不得宣称具备 `DEVICE_SMOKE`、`DEVICE_NUMERIC` 或压测指标。

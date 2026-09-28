@@ -1,0 +1,40 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Noto Sans CJK SC
+skinparam defaultFontSize 14
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam backgroundColor white
+skinparam ArrowColor #405267
+skinparam nodesep 55
+skinparam ranksep 65
+title torch_npu 双重异步：四个职责阶段，三类 Host 线程\n主线：c = torch.add(a, b)；TASK_QUEUE_ENABLE=2
+
+rectangle "① 生产\n<b>Host 线程 A：调用者</b>\n────────────────────\n创建输出 c\n复制元数据、保存数据地址\n构造捕获目标流 S 的闭包" as P #E7F1FF
+queue "Repository\nHost 环形缓冲\n有效容量 4095" as Q #FFF4D6
+rectangle "② 准备与发射\n<b>Host 线程 B：StartConsume</b>\n────────────────────\nReadQueue → customHandler\n转换参数 / executor / workspace\n调用 CANN 用户态 API\naclnnAdd(..., S)" as C #E7F1FF
+rectangle "③ 设备异步执行\n<b>CANN → Driver / Firmware / NPU</b>\n────────────────────\n执行流上的工作与依赖\n由 Runtime 同步接口确认完成\n内部队列 / MMIO / TS 未展开" as D #ECEEF1
+queue "ReleaseQueue\nHost 环形缓冲\n有效容量 8191" as RQ #E6F4E7
+rectangle "④ Host 任务对象回收\n<b>Host 线程 C：StartRelease</b>\n────────────────────\nReleaseParamFunc\n清空剩余闭包及其持有对象\n不等待设备完成" as R #E6F4E7
+
+P -right-> Q : RunOpApiV2 → Enqueue\n移交闭包所有权
+Q -right-> C : 消费任务\nefd_read 等待 / 唤醒
+C .right.> D : CANN 提交边界\n内部协议不作推断
+C -down-> RQ : 下发 API 返回后\n消费线程移交剩余闭包
+RQ -right-> R : 独立释放线程消费
+note bottom of Q
+  队满：调用者等待 efd_write
+  消费者释放槽后通知生产者
+  写槽有 mu_enqueue；无固定时延保证
+end note
+note bottom of RQ
+  部分 ACL 参数已在消费线程清理
+  回收与设备执行并行
+  显存复用另由 allocator / Event 约束
+end note
+legend bottom
+  实线：已核对的 Host 任务移交；虚线：CANN 之后未展开的执行边界
+  单个 Repository 的结构如图；默认按设备共享，PER_STREAM_QUEUE=1 时按内部流拆分
+  两个完成条件：Repository 排空确认 Host 已下发；Runtime 同步确认设备已完成
+endlegend
+@enduml

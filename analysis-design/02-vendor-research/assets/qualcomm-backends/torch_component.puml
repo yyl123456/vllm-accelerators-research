@@ -1,0 +1,30 @@
+@startuml
+skinparam defaultFontName Noto Sans CJK SC
+skinparam defaultFontSize 15
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam ArrowColor #456078
+skinparam componentStyle rectangle
+skinparam sequenceMessageAlign center
+!pragma layout smetana
+top to bottom direction
+title torch-qaic：独立设备后端的研究范围
+rectangle "PyTorch 应用\n独立模型 / 微调 / vLLM 模型执行" as app #E8F0FA
+rectangle "对上接口（公开使用代码可见）\n设备与 Tensor · 内存统计 · Stream/Event\n普通/专用算子 · AMP · QCCL · 调试与 profiling" as api #E4F4ED
+rectangle "JIT Runtime\n官方架构描述的算子执行层" as jit #FFF0D9
+rectangle "预写 kernel 库\n官方描述" as lib #FFF0D9
+rectangle "扩展 kernel 实例\n公开 C++：资源配置、参数、VTCM、DMA、HVX" as ext #E4F4ED
+rectangle "Cloud AI 硬件" as hw #E8F0FA
+rectangle "尚未取得的内部实现\nallocator / Host 队列 / 扩展装载\nJIT 到 Driver 的具体协议" as gap #EEEEEE
+app --> api : import torch_qaic\n使用 qaic 设备
+api --> jit : 官方层次关系
+lib --> jit : 提供算子实现
+jit --> hw : 官方执行关系
+api ..> ext : custom_ops 网格调用与设备入口均可见\n中间装载/下发尚未闭合
+jit .. gap
+note bottom of ext
+一个扩展实例不等于完整 backend 源码
+核内同步也不等于 Host Stream 实现
+end note
+@enduml

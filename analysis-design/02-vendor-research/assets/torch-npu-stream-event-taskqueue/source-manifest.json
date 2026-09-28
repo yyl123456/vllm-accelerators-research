@@ -1,0 +1,48 @@
+{
+  "torch_npu_commit": "b262bae21efdcccc31c28fbb96ed85c6020df943",
+  "op_plugin_commit": "743b073b88a99a505ab7086823376ff15f0316be",
+  "origin": "https://gitcode.com/ascend/op-plugin.git",
+  "retrieved": "2026-09-21",
+  "files": [
+    {
+      "path": "op_plugin/ops/opapi/AddKernelNpuOpApi.cpp",
+      "sha256": "de32357df72e4f9b577a246e97a598abbee0a86c36cf70ac19d4226e8e611c45",
+      "bytes": 6877
+    },
+    {
+      "path": "op_plugin/ops/aclops/AddKernelNpu.cpp",
+      "sha256": "859456ee141444e3f90077950fa13662ed128285d28d7dfd6ffb1eb51af6a61c",
+      "bytes": 10922
+    },
+    {
+      "path": "op_plugin/utils/op_api_common.h",
+      "sha256": "6e8a3251de32f149ff57d7aa8a569588489241f72248977225a8e78d510039c4",
+      "bytes": 67100
+    },
+    {
+      "path": "op_plugin/utils/op_api_common_base.h",
+      "sha256": "4f4bc2058a0df0265664c65b91751d429f59caff2f6f26c2a7d4af70523683bc",
+      "bytes": 29631
+    },
+    {
+      "path": "op_plugin/utils/op_api_common.cpp",
+      "sha256": "0660b09418c62fbbd3a5e31127cf1b37585b6e37ee5e6d87123a16a4a9fd62eb",
+      "bytes": 61998
+    },
+    {
+      "path": "op_plugin/config/op_plugin_functions.yaml",
+      "sha256": "b1fdaefdab8edb6f6583f4fe54a4e483dd633740011256ac8c22d1091440b472",
+      "bytes": 352911
+    },
+    {
+      "path": "torchnpugen/gen.py",
+      "sha256": "2ec5a5a22a1aca2fa18759a332142a8e8943b03f21138ab91bd958e09f535397",
+      "bytes": 16347
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "325488df8d01b0601a46b395904b6ce72f4870cd608f49268904e994dab15f97",
+      "bytes": 2315
+    }
+  ]
+}

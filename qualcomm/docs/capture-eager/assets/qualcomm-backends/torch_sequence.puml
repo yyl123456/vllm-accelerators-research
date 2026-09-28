@@ -1,0 +1,35 @@
+@startuml
+skinparam defaultFontName Noto Sans CJK SC
+skinparam defaultFontSize 15
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam ArrowColor #456078
+skinparam componentStyle rectangle
+skinparam sequenceMessageAlign center
+title 融合 add + RMSNorm：已见源码与中间缺口
+participant "Python 包装" as py
+participant "torch-qaic\ncustom_ops" as api
+participant "SDK Host 层\n实现未取得" as sdk #EEEEEE
+participant "设备入口\nrms_norm_dispatch" as entry
+participant "FP16 kernel\n各核 / HVX 线程" as k
+py -> py : torch.empty 分配两个输出
+py -> api : kernel[核数, 每核线程数](指针与标量参数)
+api --> sdk : 装载、参数封装、提交：细节待核查
+note over sdk,entry #EEEEEE
+此段为证据缺口；虚线不代表已核查的调用关系
+end note
+sdk --> entry : 入口声明：Config + PointerArray
+entry -> entry : dtype / 编译目标分派
+entry -> k : FP16 实现
+k -> k : 读 coreID / threadID 等配置\n检查行宽、VTCM 容量，划分工作区
+k -> k : 按 coreID + 迭代数 × 核数 分配行
+loop 处理分配到的行
+k -> k : DDR → VTCM 搬运输入\n部分预取与当前计算重叠
+k -> k : 多线程相加与平方和\n同步、归约、同步、归一化
+k -> k : VTCM → DDR 写回两种输出\nDMA 等待与核内线程同步
+end
+note over py,k #FFF0D9
+Host 完成通知与 Tensor 生命周期实现未见；不从核内等待反推 Host 同步语义
+end note
+@enduml

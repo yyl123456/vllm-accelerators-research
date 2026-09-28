@@ -1,0 +1,605 @@
+[
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytforward",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 574,
+    "end": 581
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "aotworker",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 632,
+    "end": 698
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "aotrun",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1055,
+    "end": 1115
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "platform",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 48,
+    "end": 71
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytrunner",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 326,
+    "end": 386
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "entry",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/setup.py",
+    "start": 309,
+    "end": 320
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "register",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/__init__.py",
+    "start": 32,
+    "end": 39
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "patch",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform.py",
+    "start": 23,
+    "end": 48
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytinit",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 193,
+    "end": 214
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytdevice",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 251,
+    "end": 338
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytload",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 414,
+    "end": 432
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "pytmemory",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 342,
+    "end": 408
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "aotmemory",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 704,
+    "end": 771
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "load",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1398,
+    "end": 1424
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "qeffcall",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1505,
+    "end": 1511
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "loadqpc",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 1556,
+    "end": 1579
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "qcompile",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/base/modeling_qeff.py",
+    "start": 1262,
+    "end": 1343
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "ops",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/__init__.py",
+    "start": 9,
+    "end": 59
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "aotcall",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1218,
+    "end": 1276
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "prefill",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 707,
+    "end": 824
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "decode",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic.py",
+    "start": 828,
+    "end": 895
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "enqueue",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 542,
+    "end": 583
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "asyncout",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 240,
+    "end": 282
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "sample",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1329,
+    "end": 1410
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "complete",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 628,
+    "end": 663
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "flags",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 248,
+    "end": 313
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "slots",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 806,
+    "end": 816
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "attnselect",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 487,
+    "end": 499
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "attn",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/attention/backends/qaic_attn.py",
+    "start": 337,
+    "end": 451
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "norm",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/layernorm.py",
+    "start": 20,
+    "end": 40
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "ropecall",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/rotary_embedding.py",
+    "start": 47,
+    "end": 77
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "customreg",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/_custom_ops.py",
+    "start": 79,
+    "end": 145
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "compileoff",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 387,
+    "end": 409
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "capture",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 481,
+    "end": 488
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "comm",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/distributed/communicator.py",
+    "start": 6,
+    "end": 17
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "session",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 63,
+    "end": 160
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "activate",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/model_loader/qaic_session_np.py",
+    "start": 416,
+    "end": 426
+  },
+  {
+    "document": "28-vllm-qaic-backend.md",
+    "key": "custom",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/_custom_ops.py",
+    "start": 12,
+    "end": 50
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "modelcall",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/train_utils.py",
+    "start": 186,
+    "end": 201
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "dispatch",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/csrc/add_rms_norm/dispatch.cpp",
+    "start": 19,
+    "end": 64
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "kernel",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/csrc/add_rms_norm/kernel.cpp",
+    "start": 156,
+    "end": 220
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "finetune",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/cloud/finetune.py",
+    "start": 38,
+    "end": 45
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "backward",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/train_utils.py",
+    "start": 246,
+    "end": 263
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "ddp",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/cloud/finetune.py",
+    "start": 83,
+    "end": 119
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "platform",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 48,
+    "end": 71
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "private",
+    "repository": "pytorch/pytorch",
+    "commit": "aa0848b617bde8814291fbe9b025f5c8ce124c3b",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/pytorch/torch/utils/backend_registration.py",
+    "start": 76,
+    "end": 130
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "norm",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/layernorm.py",
+    "start": 20,
+    "end": 40
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "ropecall",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/rotary_embedding.py",
+    "start": 47,
+    "end": 77
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "custom",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/_custom_ops.py",
+    "start": 12,
+    "end": 50
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "pytmemory",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/worker.py",
+    "start": 342,
+    "end": 408
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "memapi",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 148,
+    "end": 161
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "mempatch",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/patch/patch_mem_utils.py",
+    "start": 7,
+    "end": 41
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "wrap",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 1956,
+    "end": 1966
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "pytrunner",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/worker/model_runner.py",
+    "start": 326,
+    "end": 386
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "dma",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/csrc/add_rms_norm/kernel.cpp",
+    "start": 19,
+    "end": 70
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "kernelmath",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/csrc/add_rms_norm/kernel.cpp",
+    "start": 73,
+    "end": 154
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "props",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 98,
+    "end": 136
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "buildapi",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/setup.py",
+    "start": 100,
+    "end": 165
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "build",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/setup.py",
+    "start": 43,
+    "end": 97
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "kernelloop",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/csrc/add_rms_norm/kernel.cpp",
+    "start": 251,
+    "end": 376
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "rope",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/ops/rotary_embedding.py",
+    "start": 16,
+    "end": 25
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "verifier",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/helper.py",
+    "start": 126,
+    "end": 175
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "amp",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/helper.py",
+    "start": 110,
+    "end": 123
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "scaler",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/helper.py",
+    "start": 178,
+    "end": 201
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "profile",
+    "repository": "quic/efficient-transformers",
+    "commit": "e127a6b741d8b71e81134cc76c7e24cea7210cdc",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/qualcomm/efficient-transformers/QEfficient/finetune/utils/helper.py",
+    "start": 206,
+    "end": 233
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "compileoff",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/vllm_qaic/platform_base.py",
+    "start": 387,
+    "end": 409
+  },
+  {
+    "document": "29-torch-qaic-backend.md",
+    "key": "install",
+    "repository": "qualcomm/vllm-qaic",
+    "commit": "3212cc670130b7e5290b429f781dc978d7ecf430",
+    "path": "/home/yyl/workspace/llmss/engine/vllm/vllm-qaic/docs/docs/getting_started/installation/pyt_mode.md",
+    "start": 30,
+    "end": 64
+  }
+]

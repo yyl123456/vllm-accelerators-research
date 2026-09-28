@@ -1,0 +1,33 @@
+@startuml
+skinparam defaultFontName Noto Sans CJK SC
+skinparam defaultFontSize 15
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam ArrowColor #456078
+skinparam componentStyle rectangle
+skinparam sequenceMessageAlign center
+title AoT：从本轮调度到可消费的结果
+participant "vLLM\n调度/结果处理" as s
+participant "QAIC\nWorker / Runner" as r
+participant "QaicCausalLM" as m
+participant "QAICInferenceSession" as ses
+participant "qaicrt" as rt
+s -> r : SchedulerOutput
+r -> r : 更新请求状态与 KV 槽位\n准备 token、position、batch_index
+r -> m : prefill / decode 输入
+m -> m : 按编译规格分块、补齐
+m -> ses : np_run(inputs)
+ses -> rt : ExecObj.setData\nQueue.enqueue
+ses --> m : 执行对象索引
+m --> r : 保留执行状态
+note over r,rt #FFF0D9
+提交不等于完成：NumPy 缓冲区须存活到等待结束
+end note
+r -> ses : complete_inf(index)\n同步路径或延后至结果处理
+ses -> rt : waitForCompletion
+rt --> ses : 完成 / 错误
+ses --> r : 可消费结果
+r -> r : logits 处理与采样\n或处理设备采样输出
+r --> s : 本轮结果
+@enduml

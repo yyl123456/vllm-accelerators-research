@@ -1,0 +1,36 @@
+@startuml
+skinparam defaultFontName Noto Sans CJK SC
+skinparam defaultFontSize 15
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam ArrowColor #456078
+skinparam componentStyle rectangle
+skinparam sequenceMessageAlign center
+!pragma layout smetana
+top to bottom direction
+title vLLM-QAIC：调度与两条执行路线
+rectangle "vLLM 服务与 Scheduler\n决定本轮请求与 token" as sched #E8F0FA
+rectangle "QaicPlatform\n发现插件、选择 Worker、检查配置" as plat #E8F0FA
+rectangle "PYT Worker / Runner\n复用模型执行，适配层与 Attention" as pyt #E4F4ED
+rectangle "AoT Worker / Runner\n请求槽位、prefill/decode 输入组织" as aot #FFF0D9
+rectangle "PyTorch 模型与 QAIC 模型层" as model #E4F4ED
+rectangle "QaicCausalLM + Session\n补齐输入、绑定数据、提交/等待" as session #FFF0D9
+rectangle "torch-qaic\n设备张量、算子与 kernel 扩展" as torch #D5E9DD
+rectangle "qaicrt\n已编译程序的加载与执行" as rt #F4DFC0
+rectangle "QEfficient / Compiler\n生成 QPC 编译产物" as compiler #FFF0D9
+sched --> plat
+plat --> pyt : 存在 torch_qaic
+plat --> aot : 不存在 torch_qaic
+pyt --> model
+model --> torch
+aot --> session
+compiler --> session : QPC
+session --> rt
+note bottom of torch
+设备后端内部另见 PyTorch 专题
+end note
+note bottom of rt
+下游 API 可见；不借此推定 JIT 内部实现
+end note
+@enduml

@@ -1,0 +1,43 @@
+@startuml
+skinparam defaultFontName Noto Sans CJK SC
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam defaultFontSize 15
+skinparam sequenceMessageAlign center
+hide footbox
+title AoT 一轮生成：提交成功与执行完成是两个时刻
+participant "vLLM 调度" as s #EAF2FF
+participant "Worker / Runner" as r #EAF2FF
+participant "QaicCausalLM" as m #F1F8EE
+participant "QAICInferenceSession" as q #F1F8EE
+participant "SDK qaicrt" as rt #FFF5E6
+s -> r : SchedulerOutput
+r -> r : 更新请求；拆分 prefill / decode\nblock_id - 1 → KV 槽位 batch_index
+r -> m : forward(tokens, positions, batch_index)
+m -> m : prefill 分块补齐 / decode 补齐 batch
+m -> q : np_run(inputs)
+q -> rt : ExecObj.setData(...)\nQueue.enqueue(execObj)
+rt --> q : 提交状态
+q --> m : exec_obj_idx
+note over q, rt
+此时不能据此认定硬件已完成。
+Host 输入输出缓冲区须存活到完成。
+end note
+alt 同步调度
+ m -> q : complete_inf(index)
+ q -> rt : waitForCompletion()
+ rt --> q : 完成 / 错误
+else 异步调度
+ m --> r : 保存未完成的执行状态
+ r -> q : 消费结果时完成等待
+ q -> rt : waitForCompletion()
+ rt --> q : 完成 / 错误
+end
+q -> q : prefill 执行对象归还池
+r -> r : 普通文本生成路径：\n处理 logits、采样、记账
+r --> s : ModelRunnerOutput / 生成 token
+note over s, rt
+范围：普通 AoT 文本生成主线；省略推测解码、多模态与分离部署分支。
+不展开 SDK 内部线程，也不虚构从 Python Queue 到内核的逐函数链。
+end note
+@enduml

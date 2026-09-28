@@ -1,0 +1,40 @@
+@startuml
+!pragma layout smetana
+skinparam defaultFontName Noto Sans CJK SC
+skinparam backgroundColor #FFFFFF
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam ArrowColor #53657C
+skinparam packageStyle rectangle
+skinparam defaultFontSize 15
+title 高通 Cloud AI：同一个服务入口，两种执行契约
+component "vLLM 服务与调度\n决定本轮处理哪些请求和 token" as v #EAF2FF
+component "vllm-qaic 插件\n选择 Worker / Runner，整理输入" as p #EAF2FF
+v --> p
+package "AoT：执行已编译的模型" #F1F8EE {
+ component "QEfficient + qaic-compile\n模型导出、规格与多设备配置" as c
+ artifact "QPC\n编译产物 + 输入输出规格" as q
+ component "QaicModelRunnerAoT\n按规格补齐；映射 KV 槽位" as a
+ component "SDK qaicrt\nProgram / ExecObj / Queue" as r
+ c --> q
+ q --> r : 加载
+ a --> r : 绑定输入 / enqueue / 等待
+}
+package "PYT：执行 PyTorch 模型" #FFF5E6 {
+ component "QaicModelRunnerPyt\n复用 GPUModelRunner 执行框架" as e
+ component "torch-qaic\n设备、算子、Stream / Event" as t
+ component "JIT runtime 与算子库\n本轮未取得内部实现" as j #EEEEEE
+ e --> t
+ t --> j : 官方文档描述
+}
+p --> a
+p --> e
+rectangle "底层证据：需区分 SDK 版本\n公开 Open Runtime → ioctl → Linux qaic 驱动\n不能把它直接当作当前 qaicrt / JIT 的完整实现" as boundary #EEEEEE
+r ..> boundary : 接口边界参考
+rectangle "AIC100 硬件接口（Linux 官方文档）\n管理：MHI → QSM 固件\n数据：DMA Bridge → workload / NSP 与 DDR" as hw #F3EFFF
+boundary --> hw
+legend bottom
+实线：对应层有源码或官方接口证据；不表示所有组件来自同一 SDK 构建。
+灰色：实现或版本连接尚未闭合。NSP 是 SoC 内计算核，不能直接等同常规独立 NPU。
+endlegend
+@enduml

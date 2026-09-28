@@ -1,0 +1,67 @@
+@startuml
+title torch_npu Eager add / Event / synchronize\nPinned torch_npu b262bae + op-plugin 743b073
+hide footbox
+skinparam backgroundColor #FFFFFF
+skinparam sequenceMessageAlign center
+skinparam maxMessageSize 220
+actor "Python caller" as Py
+participant "ATen / op_plugin\ncaller thread" as Op
+queue "Repository\nHost ring buffer" as Q
+participant "ACL consumer\nHost thread" as C
+participant "CANN APIs\naclnn / aclrt" as ACL
+participant "Driver / Firmware / NPU\nnot expanded by this source scope" as HW #EEEEEE
+participant "ReleaseQueue\nHost release thread" as R
+note over Py,R
+Normal Eager path; TaskQueue enabled; no graph capture, lazy fusion or cache hit.
+Default: one Repository per device; PER_STREAM_QUEUE: one per used internal stream.
+end note
+Py -> Op: y = torch.add(a, b)
+Op -> Op: allocate result; capture current aclrtStream S
+alt TASK_QUEUE_ENABLE = 1 (default)
+  Op -> ACL: ConvertTypes; aclnnAddGetWorkspaceSize
+  ACL --> Op: executor + workspace size
+  Op -> Op: allocate workspace; build closure
+else TASK_QUEUE_ENABLE = 2
+  Op -> Op: CopyTypesV2: metadata + data pointers; build closure
+end
+Op -> Q: RunOpApiV2 -> Enqueue\ncopy/move closure into owned slot
+opt ring full
+  Q -> Q: caller waits on efd_write\nconsumer notifies when space becomes available
+end
+Op --> Py: return Tensor (device result may be pending)
+note over Q,C: First enqueue in INIT also waits for Host drain before switching to RUN.
+Q -> C: efd_read wakeup / ReadQueue
+C -> C: AsncExecFunc -> ExecFuncOpApi -> customHandler
+opt TASK_QUEUE_ENABLE = 2
+  C -> ACL: ConvertTypesV2; aclnnAddGetWorkspaceSize
+  ACL --> C: executor + workspace size
+  C -> C: allocate workspace on captured S
+end
+C -> ACL: aclnnAdd(workspace, size, executor, S)
+ACL -->> HW: execution submitted through CANN\ninternal driver protocol not shown
+ACL --> C: API returns (not proof of device completion)
+C -> C: release ACL conversion objects
+C -> R: move task resources to ReleaseQueue
+C -> Q: advance read_idx; notify efd_write / efd_empty
+R -> R: clear customHandler / free Host parameters
+note over C,R: Parameter release is not a hardware completion fence.
+Py -> Op: event.record(S); stream T.wait_event(event)
+Op -> Q: RECORD_EVENT(S)
+Q -> C: consume record
+C -> ACL: aclrtRecordEvent(event, S)
+ACL --> C: return
+C -> C: DecreaseUnrecordedCount
+note over Op,C: Per-stream queue or IPC: caller waits for record submission count to clear.
+Op -> Q: WAIT_EVENT(T)
+Q -> C: consume wait
+C -> ACL: aclrtStreamWaitEvent(T, event)
+note over ACL,HW: Runtime stream dependency; caller does not synchronize device completion here.
+Py -> Op: torch.npu.synchronize()
+Op -> Q: emptyAllNPUStream -> MakeSureQueueEmpty
+Q --> Op: all inspected Host queues drained / errors checked
+Op -> ACL: aclrtSynchronizeDeviceWithTimeout
+ACL -->> HW: wait for current device work (implementation not expanded)
+HW -->> ACL: completion / error
+ACL --> Op: status
+Op --> Py: return / raise
+@enduml

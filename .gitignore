@@ -1,0 +1,45 @@
+# Git ignore rules for open-source research workspace
+
+# 1. 忽略所有第三方大仓库（避免开源提交外部源码）
+third_party/
+huawei/third_party/
+qualcomm/third_party/
+google/third_party/
+tenstorrent/third_party/
+
+# 2. Python 缓存与临时文件
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 3. 编辑器与 IDE 配置
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# 4. 日志与临时调试文件
+*.log
+/tmp/
