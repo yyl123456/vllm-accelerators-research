@@ -11,6 +11,16 @@ Tenstorrent 方案兼具 **基于 MLIR/XLA 的静态编译探索** 与 **基于 
 
 ---
 
+## 官方路线侧重与侧重程度说明
+
+- **vLLM TT-Plugin 与原生执行路线（当前生产交付主线，侧重程度：★★★★☆）**：
+  - **定位与实际使用**：Tenstorrent 当前在 vLLM 服务端推理中的**实际落地主导路线**。官方独立维护了 `vllm-tt-plugin`，通过重写自定义 Engine、TTScheduler（实现 Prefill/Decode 物理多 Lane 分流）以及设备端 Sampling 下推，直接调用手工调优的 TTNN 高性能算子库和 TT-Metal Command Queue 下发，是目前能够在 Wormhole/Blackhole 卡上跑起真实 LLM Serving 的唯一成熟途径。
+- **TT-MLIR / TT-XLA 编译路线（长期战略演进方向，侧重程度：★★★☆☆）**：
+  - **定位与实际使用**：Tenstorrent 架构团队倾力投入的下一代统一编译器方案。目标是通过 StableHLO/TTIR/TTMetal Dialect 实现端到端自动图融合与代码生成，输出 Flatbuffer 静态产物。
+  - **落地成熟度**：目前该编译器管线在单个模型或算子验证上快速演进，但在集成到 vLLM 动态 Batch、Paged KV Cache 以及长文本 Serving 场景时，端到端打通与调优成熟度仍落后于手工优化的 TT-Plugin 路径。
+
+---
+
 ## 路线子目录说明与权威对应
 
 - **`aot/`**：**TT-MLIR / TT-XLA 编译路线**

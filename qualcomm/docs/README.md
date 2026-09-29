@@ -9,6 +9,17 @@
 
 ---
 
+## 官方路线侧重与侧重程度说明
+
+- **AOT 静态编译路线（绝对主导 / 工业成熟路径，侧重程度：★★★★★）**：
+  - **定位与实际使用**：高通 Cloud AI 100/Ultra 在生产环境与官方基准测试（如 MLPerf）中的**绝对标准路径**。官方 SDK、编译链（`QEfficient` 导出 ONNX → QAIC 编译器生成 QPC 二进制包）以及官方评测工具（`qaic-runner`）均围绕 AOT 路线构建。
+  - **源码默认行为**：在 `vllm-qaic` 中，平台默认分发行为是只要环境中未安装闭源的 `torch_qaic` 动态包（`is_aot = not _torch_qaic_installed`），系统**无缝 Fallback 并强制走 `QaicWorkerAoT` 路径**。该模式绕过 PyTorch 调度开销，执行确定性与硬件利用率最高。
+- **PyTorch / PYT Eager 路线（演进探索 / 受限受众路径，侧重程度：★★☆☆☆）**：
+  - **定位与实际使用**：高通为了迎合 PyTorch 动态图与 PagedAttention 生态而新增的次要路线，目前仍处于向生态对齐的演进期。
+  - **受限因素**：其底层核心依赖闭源分发的 `torch-qaic` wheel（需高通账号从 QPM 下载），且 C++ Dispatcher/Allocator 均闭源；在 vLLM 插件中该路线明确关闭了部分分布式特性与 Disaggregated Serving，工业公开落地案例远少于标准 AoT。
+
+---
+
 ## 路线子目录说明与权威对应
 
 - **`aot/`**：**AOT 静态编译路线**

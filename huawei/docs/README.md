@@ -9,6 +9,16 @@
 
 ---
 
+## 官方路线侧重与侧重程度说明
+
+- **解析执行与动态 Capture 路线（绝对主导 / 工业交付主线，侧重程度：★★★★★）**：
+  - **定位与实际使用**：华为昇腾在 vLLM 服务端推理中的**唯一主力生产路径**。基于 `torch_npu` (PrivateUse1)、ATen 算子映射（`op-plugin`）对接 CANN ACLNN，并通过 `vllm-ascend` 的 ModelRunner 进行 **ACL Graph 捕获与重放**。该路线兼顾了 PyTorch 动态图生态、PagedAttention 定制算子与零 Python 开销的极速执行。
+- **AOT / GE 图编译路线（前沿探索 / 实验验证，侧重程度：★★☆☆☆）**：
+  - **定位与实际使用**：华为通过 `torchair` 对接 PyTorch 2.x `torch.compile` / Dynamo，将 FX Graph 转换为 GE (Graph Engine) 静态图。
+  - **受限因素**：在面对大模型长序列、连续批处理（Continuous Batching）以及动态 Shape 频繁变化的 Serving 场景下，GE 图的重编译开销和动态算子覆盖度仍存在工程挑战，目前主要作为前沿编译探索，非 vLLM 线上服务默认推荐。
+
+---
+
 ## 路线子目录说明与权威对应
 
 - **`capture-eager/`**：**解析执行与动态 Capture / ACL Graph 路线（主线）**
