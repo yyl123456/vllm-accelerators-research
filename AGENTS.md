@@ -150,3 +150,7 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
    - 遇到未开源模块（如高通闭源编译器内部、Torch-QAIC 内部 C++、TPU libtpu 内部），必须显式标记为“未知/空缺（`UNKNOWN`）”，不得凭常规逻辑脑补底层行为。
 3. **第三方代码只读隔离**：
    - 所有外部仓库集中在对应的 `third_party/` 目录下，禁止随意修改；所有研究产出均归档至对应文档中。
+4. **路线侧重与成熟度显式声明规范（Vendor Route Focus & Maturity）**：
+   - **禁止平行并列而不分主次**：撰写或更新任何厂商架构文档（尤其是各厂商 `docs/README.md`）时，**严禁将两条路线（AOT 静态编译 vs Capture-Eager 动态执行）毫无区分地并列平铺**。
+   - **必须显式标明官方侧重程度与成熟度评级**（采用 5 星制）：必须清晰写明哪一条路线是官方当前在真实服务化（Serving）中的**绝对主力交付路径**，哪一条是实验探索、长期战略或受限路径；
+   - **必须给出底层工程事实依据**：例如平台默认代码 Fallback 逻辑、官方评测/MLPerf 交付形态、闭源 SDK 约束或动态连续批处理（Continuous Batching）工程瓶颈，杜绝模糊断言。
