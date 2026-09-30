@@ -154,3 +154,26 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
    - **禁止平行并列而不分主次**：撰写或更新任何厂商架构文档（尤其是各厂商 `docs/README.md`）时，**严禁将两条路线（AOT 静态编译 vs Capture-Eager 动态执行）毫无区分地并列平铺**。
    - **必须显式标明官方侧重程度与成熟度评级**（采用 5 星制）：必须清晰写明哪一条路线是官方当前在真实服务化（Serving）中的**绝对主力交付路径**，哪一条是实验探索、长期战略或受限路径；
    - **必须给出底层工程事实依据**：例如平台默认代码 Fallback 逻辑、官方评测/MLPerf 交付形态、闭源 SDK 约束或动态连续批处理（Continuous Batching）工程瓶颈，杜绝模糊断言。
+
+---
+
+## 调研写文档、更新与提交闭环标准流程（Mandatory SOP）
+
+为避免多轮交互中遗漏文档落地或版本管理，**所有 Agent 在完成任何专项调研或代码深究任务后，必须自动执行以下闭环操作，严禁等待用户单独催促**：
+
+1. **落盘专用技术文档（Documentation）**：
+   - 调研完成后，必须立即在对应模块或厂商目录下（如 `<vendor>/docs/<route>/` 或新开 `<vendor>/docs/`）创建或更新结构严谨的 Markdown 专题文档。
+   - 文档内必须包含：调研日期、源码基线（准确 SHA 或 Tag）、权威对应编号、端到端链路机制、精准源码行号锚点（`path/file.py:Lxx-Lyy`）、开闭源边界与客观工程局限。
+2. **同步更新主目录与导航索引（Index Update）**：
+   - 同步在对应厂商/模块的导航入口（如 `<vendor>/docs/README.md` 或根导航）中注册新增专题文档的超链接与核心结论简述，确保知识库索引完整。
+3. **工作区合规性静态校验（Compliance Check）**：
+   - 文档编写与更新完成后，必须运行单进程合规校验脚本：
+     ```bash
+     python3 tools/verify_research.py
+     ```
+   - 必须确保 105 篇权威 Manifest、全量 Markdown 相对链接以及 Claim 索引校验全部显示 `PASS`。若有失效链接，必须立即自愈修复。
+4. **Git 本地提交与推送（Commit & Push）**：
+   - 检查 `git status`，严格将新写的 Markdown 文档及相关索引变更通过 `git add` 暂存（确保 `.gitignore` 保护 third_party 源码目录不被误提）。
+   - 严格遵循语义化规范进行提交（如 `git commit -m "docs(<scope>): <description>"`，确保配置正确的 user.name 与 user.email）。
+   - **主动推送远程**：执行 `git push origin main`。若环境因缺少网络凭据（如未配置 GitHub Token/SSH 导致终端鉴权阻塞），必须在总结报告中明确标出本次 commit 的 SHA 与变更范围，并提醒用户本地已提交完毕，方便后续推送。
+
