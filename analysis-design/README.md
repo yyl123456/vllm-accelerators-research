@@ -40,6 +40,7 @@
 | [02-vendor-research/36-cross-accelerator-p2p-and-shared-memory-handbook.md](./02-vendor-research/36-cross-accelerator-p2p-and-shared-memory-handbook.md) | 异构加速卡 P2P 通信与硬件共享内存设计手册 | CUDA IPC、HCCS NPU IPC 与 NoC 寻址 | `09-hardware-foundations/20260903-90` |
 | [02-vendor-research/37-communication-compute-fusion-handbook.md](./02-vendor-research/37-communication-compute-fusion-handbook.md) | 通信计算融合 (Fusion) 算子自研设计与优化手册 | AllGather-GEMM、ReduceScatter-GEMM 与 XLA 融合 | `05-vllm-compile/20260903-51` |
 | [02-vendor-research/38-collective-communication-benchmark-and-troubleshooting-handbook.md](./02-vendor-research/38-collective-communication-benchmark-and-troubleshooting-handbook.md) | 集合通信性能压测、拓扑基准与死锁排查手册 | AlgBW/BusBW 折算、Hang Dump 与看门狗设计 | `14-decisions/20260903-142` |
+| [02-vendor-research/39-low-bit-collective-communication-and-in-network-computing-handbook.md](./02-vendor-research/39-low-bit-collective-communication-and-in-network-computing-handbook.md) | 低精度量化通信、网内计算 (SHARP/CCU) 与拥塞流控手册 | FP8/FP4 传输、网内规约与 DCQCN 流控 | `09-hardware-foundations/20260903-90` |
 | [03-runtime-interfaces/30-reference-interfaces.md](./03-runtime-interfaces/30-reference-interfaces.md) | 运行时抽象接口对比 | 跨平台运行时契约与设计 | `14-decisions/20260903-143` |
 | [03-runtime-interfaces/31-modular-device-context.md](./03-runtime-interfaces/31-modular-device-context.md) | Modular device_context 研究 | 异构硬件抽象模型 | 接口参考扩展 |
 | [03-runtime-interfaces/32-modular-asyncrt-c-abi.md](./03-runtime-interfaces/32-modular-asyncrt-c-abi.md) | Modular AsyncRT C ABI 分析 | 异步 C ABI 运行时接口 | 接口参考扩展 |
