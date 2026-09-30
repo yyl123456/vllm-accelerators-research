@@ -34,6 +34,7 @@
 | [02-vendor-research/29-torch-qaic-backend.md](./02-vendor-research/29-torch-qaic-backend.md) | 高通 PyTorch 设备后端解析 | 设备扩展、内存/同步与算子接入 | `11-qaic/20260903-111, 113` |
 | [02-vendor-research/31-cross-vendor-collective-communication-deep-research.md](./02-vendor-research/31-cross-vendor-collective-communication-deep-research.md) | 跨厂商集合通信算子底层实现与优化对比 | 集合通信底层原理、MC2、CCL与算法优化 | `14-decisions/20260903-140, 141` |
 | [02-vendor-research/32-collective-communication-kernel-optimization-handbook.md](./02-vendor-research/32-collective-communication-kernel-optimization-handbook.md) | 集合通信算子内核自研与性能优化实战手册 | 数学推导、状态机流转与自研架构法则 | `14-decisions/20260903-140, 141` |
+| [02-vendor-research/33-moe-collective-communication-and-eplb-handbook.md](./02-vendor-research/33-moe-collective-communication-and-eplb-handbook.md) | MoE 专家并行 AllToAll 与动态负载均衡优化指南 | EPLB 调度、DualPipe 流水与稀疏通信 | `14-decisions/20260903-140, 141` |
 | [03-runtime-interfaces/30-reference-interfaces.md](./03-runtime-interfaces/30-reference-interfaces.md) | 运行时抽象接口对比 | 跨平台运行时契约与设计 | `14-decisions/20260903-143` |
 | [03-runtime-interfaces/31-modular-device-context.md](./03-runtime-interfaces/31-modular-device-context.md) | Modular device_context 研究 | 异构硬件抽象模型 | 接口参考扩展 |
 | [03-runtime-interfaces/32-modular-asyncrt-c-abi.md](./03-runtime-interfaces/32-modular-asyncrt-c-abi.md) | Modular AsyncRT C ABI 分析 | 异步 C ABI 运行时接口 | 接口参考扩展 |
