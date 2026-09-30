@@ -42,6 +42,7 @@ wheels/
 
 # 5. 第三方仓库（非子模块或直接检出目录）
 modular/third_party/
+nvidia/third_party/
 google/third_party/gemma/
 google/third_party/maxtext/
 google/third_party/paxml/

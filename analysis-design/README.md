@@ -32,6 +32,7 @@
 | [02-vendor-research/27-qualcomm-cloud-ai-stack.md](./02-vendor-research/27-qualcomm-cloud-ai-stack.md) | 高通 Cloud AI 全栈技术架构 | AOT 编译器与 Runtime 架构 | `11-qaic/20260903-110, 111` |
 | [02-vendor-research/28-vllm-qaic-backend.md](./02-vendor-research/28-vllm-qaic-backend.md) | 高通 vLLM 后端适配深度分析 | 插件注册、AoT 与 PYT 双模式对比 | `11-qaic/20260903-112, 114` |
 | [02-vendor-research/29-torch-qaic-backend.md](./02-vendor-research/29-torch-qaic-backend.md) | 高通 PyTorch 设备后端解析 | 设备扩展、内存/同步与算子接入 | `11-qaic/20260903-111, 113` |
+| [02-vendor-research/31-cross-vendor-collective-communication-deep-research.md](./02-vendor-research/31-cross-vendor-collective-communication-deep-research.md) | 跨厂商集合通信算子底层实现与优化对比 | 集合通信底层原理、MC2、CCL与算法优化 | `14-decisions/20260903-140, 141` |
 | [03-runtime-interfaces/30-reference-interfaces.md](./03-runtime-interfaces/30-reference-interfaces.md) | 运行时抽象接口对比 | 跨平台运行时契约与设计 | `14-decisions/20260903-143` |
 | [03-runtime-interfaces/31-modular-device-context.md](./03-runtime-interfaces/31-modular-device-context.md) | Modular device_context 研究 | 异构硬件抽象模型 | 接口参考扩展 |
 | [03-runtime-interfaces/32-modular-asyncrt-c-abi.md](./03-runtime-interfaces/32-modular-asyncrt-c-abi.md) | Modular AsyncRT C ABI 分析 | 异步 C ABI 运行时接口 | 接口参考扩展 |
