@@ -67,3 +67,6 @@
 [submodule "google/third_party/jetstream-pytorch"]
 	path = google/third_party/jetstream-pytorch
 	url = https://github.com/AI-Hypercomputer/jetstream-pytorch.git
+[submodule "google/third_party/torch_tpu"]
+	path = google/third_party/torch_tpu
+	url = https://github.com/google-pytorch/torch_tpu.git

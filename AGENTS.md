@@ -29,7 +29,7 @@
 
 ## 协作者与 Agent 克隆指引（Git Submodules）
 
-本工作区通过 `.gitmodules` 声明并锁定了 6 大核心第三方源码仓库，作为只读审查与证据追踪的锚点。
+本工作区通过 `.gitmodules` 声明并锁定了核心第三方源码仓库（6 大基线 + 2026-10 新增的 TorchTPU），作为只读审查与证据追踪的锚点。
 
 ### 1. 完整拉取（含 Submodules）
 外部协作者或新环境初始化时，建议运行：
@@ -41,7 +41,7 @@ git clone --recurse-submodules <本仓库URL>
 git submodule update --init --recursive
 ```
 
-### 2. 六大固定源码 Revision
+### 2. 核心固定源码 Revision（6 大基线 + TorchTPU）
 
 | 仓库 | 相对路径 | 固定 SHA | 角色与用途 |
 |---|---|---|---|
@@ -51,6 +51,7 @@ git submodule update --init --recursive
 | **vLLM TT Plugin** | `tenstorrent/third_party/vllm-tt-plugin/` | `f6995475739201fd1d2883adec477ecb37f951d9` | Tenstorrent 适配插件、自定义 Engine/Runner 与分流 |
 | **TT-Metal** | `tenstorrent/third_party/tt-metal/` | `c634b1ca4c10eea5037d80767ce5f9e2912a401f` | Tenstorrent 底层编程模型、Tensix 计算内核与 CommandQueue |
 | **TPU Inference** | `google/third_party/tpu-inference/` | `fd33800041510b957cd2da6199742cce2b5fd113` | Google TPU vLLM 适配、XLA 编译缓存与 Shape 分桶 |
+| **TorchTPU**（2026-10 新增） | `google/third_party/torch_tpu/` | `d7a3c1cc73a115376a058c7664986f5e34ca8362` | Google 官方开源 PyTorch 原生 TPU 后端：PrivateUse1 接入、DeferredOp、XLA 编译与三级缓存 |
 
 > **只读隔离铁律**：所有子模块目录仅作为只读对照基线。严禁直接在子模块中修改代码或产生未提交改动。
 
@@ -105,7 +106,7 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 
 ```text
 .
-├── .gitmodules                          # 6 大核心第三方仓库 Submodule 映射清单
+├── .gitmodules                          # 核心第三方仓库 Submodule 映射清单
 ├── .gitignore                           # 已配置忽略所有 third_party 目录及临时缓存
 ├── AGENTS.md                            # 全局规范与核心调研指引（唯一全局入口）
 ├── 20260903-vllm-ai-infra-research/     # 【核心唯一权威库】精确 105 篇全景研究文档
@@ -136,7 +137,7 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 │
 └── google/                              # 【Google TPU / XLA 路线】
     ├── docs/                            #   - 谷歌调研文档 (aot, capture-eager, comm)
-    └── third_party/                     #   - 谷歌适配代码 Submodule (tpu-inference: fd338000)
+    └── third_party/                     #   - 谷歌适配代码 Submodule (tpu-inference: fd338000, torch_tpu: d7a3c1cc)
 ```
 
 ---
@@ -144,7 +145,8 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 ## 调研原则与证据规范
 
 1. **事实铁律（Ground Truth First）**：
-   - 唯一合法证据源为本地真实源码、官方 Release、头文件/C ABI、官方手册及准确的 Commit/行号。
+   - **官方架构与设计文档优先参考（`doc/` / `docs/`）**：开源项目普遍习惯在代码仓库自身的 `doc/` 或 `docs/` 目录下集中展示系统架构、模块分层、时序流转与设计意图。在开展源码深究前，**必须优先检视目标项目自带的 `doc/` 与 `docs/` 文档**，作为构建项目整体架构心智模型与索引关键代码入口的一手优先参考资料。
+   - 唯一合法证据源为本地真实源码、官方设计与架构文档（如各仓库 `doc/` / `docs/`）、官方 Release、头文件/C ABI、官方手册及准确的 Commit/行号。
    - 文档 `15-evidence-review/20260903-152-独立Review问题、修复与剩余风险.md` 记录了 2026-09-03 对 105 篇静态文档的专项审阅，只代表当时文档的静态审阅边界，不代表硬件实测。
 2. **严禁无依据推演（Zero Unfounded Speculation）**：
    - 遇到未开源模块（如高通闭源编译器内部、Torch-QAIC 内部 C++、TPU libtpu 内部），必须显式标记为“未知/空缺（`UNKNOWN`）”，不得凭常规逻辑脑补底层行为。
