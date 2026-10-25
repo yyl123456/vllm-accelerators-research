@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "id": "2026-10-25-deepinfer-talk",
+  "title": "DeepSeek V4.1 推理系统拆解：DeepInfer 开源代码与部署 Q&A 解读",
+  "type": "slides",
+  "status": "indexed",
+  "added": "2026-10-25",
+  "language": "zh",
+  "vendors": [
+    "DeepSeek"
+  ],
+  "topics": [
+    "推理系统",
+    "EPD 分离",
+    "KV Cache 池化",
+    "3FS",
+    "EPLB",
+    "DPLB",
+    "SWA",
+    "DSpark",
+    "投机解码",
+    "负载均衡"
+  ],
+  "source": {
+    "kind": "google-drive",
+    "url": "https://drive.google.com/drive/u/0/folders/11PsIZ5xIePxMqITlIbhFIKTqDfuI8b5L",
+    "file_url": "https://drive.google.com/file/d/1ZKrCY7Q_RAhPXJ1Qy0WGxWClWIEy-wua/view",
+    "original_filename": "talk2-deepinfer.pdf",
+    "retrieved_at": "2026-10-25"
+  },
+  "source_file": {
+    "path": "talk2-deepinfer.pdf",
+    "sha256": "67e548b62612c2d49499d85d2559c66c26510b4cd08d004477dc15caeb6930cd",
+    "bytes": 3601713,
+    "pages": 32,
+    "mime": "application/pdf"
+  },
+  "derived": [
+    "extracted.txt",
+    "notes.md"
+  ],
+  "summary": "一份 32 页中文技术分享材料，逐条解读 DeepSeek V4.1（DeepInfer）生产推理系统的部署要点：EPD 分离与池化 KV 存储、Prefill/Decode 的 EP/PP 取舍、基于 3FS 的 KV 持久化与 GDR 换入、Block KV 与 SWA 两套 KV 的命中与有界重放、在线 EPLB（重排+冗余）与 DPLB（分桶/配额/时间预算）、DSpark 变长验证。含 GB300 实测数字与算法伪代码，但属讲者个人解读，并非 DeepSeek 官方文档。",
+  "key_points": [
+    "EPD 分离，P 与 D 共享一个池化 KV 存储；Prefill 路由不做 cache-aware，前缀命中依赖池化存储而非路由。",
+    "Prefill 用小 EP（compute bound），Decode 用 Wide-EP（memory bound）；暂不开 TP/CP；中小部署的 Prefill 更看好 PP。",
+    "池化 KV 落在 3FS，10+2 EC、每 GPU 逻辑容量 14.4 TB（EC 后 17.28 TB）；TTL 为 agent 3 天、chatbot 7 天。",
+    "两类 KV 分开存：Block KV（CSA，top-k+压缩）与 SWA KV（128 token 滑窗，StateBlock 静态预留，pos%134 环形缓冲）。",
+    "SWA 快照缺失时做 bounded replay：只重算最后 128 token，代价与上下文长度无关。",
+    "换入有四种搬法（copy engine 单个/批量、SM gather、GDR），DeepSeek 选 GDR：不占 SM、绕过 CUDA API。",
+    "EPLB = 重排 + 冗余；在线统计 DeepEP counter，两步算法（冗余名额分配 + Best Fit Decreasing 装箱）；GB300 实测端到端约 2%，收益几乎全来自重排。",
+    "DPLB：Prefill 按 4 个上下文长度桶 + compute quota 主动拉取 + 时间预算组 batch；Decode 同时平衡请求数与 KV 总长度（±5% band）。",
+    "DSpark 按置信度/接受率动态决定每请求验证 token 数，5 降到 3.2–4.4，平均接受长度基本不变。"
+  ],
+  "related": [
+    {
+      "path": "deepseek/README.md",
+      "note": "DeepInfer 软件栈总览与调研重点"
+    },
+    {
+      "path": "deepseek/docs/README.md",
+      "note": "DeepSeek 文档导航"
+    },
+    {
+      "path": "20260903-vllm-ai-infra-research/03-vllm-kv-memory/",
+      "note": "KV Cache、前缀缓存与内存管理对照"
+    },
+    {
+      "path": "20260903-vllm-ai-infra-research/14-decisions/",
+      "note": "跨后端选型与调度权衡对照"
+    }
+  ],
+  "authority": "secondary",
+  "caveats": "讲者个人解读，非官方文档；PDF 图表/曲线未被文本提取；GB300 实测数字与版本结论（如 EP8 收益不可外推 EP64）需以 DeepInfer 部署文档和源码复核；部分表述为讲者推测（如开源 router 是否分桶）。"
+}

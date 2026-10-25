@@ -50,4 +50,5 @@ google/third_party/praxis/
 google/third_party/saxml/
 google/third_party/t5x/
 
-
+# 6. 资料库本地依赖与缓存（pypdf 等，由 tools/materials.py 自动安装）
+.cache/

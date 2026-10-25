@@ -27,6 +27,25 @@
 
 ---
 
+## 用户资料库（materials/）与自动检索
+
+`materials/` 是用户收集的外部资料（PPT / 演讲、论文、博客、数据集、截图）的**唯一归档目录**，与 105 篇权威文档、`third_party/` 源码分离管理。每条资料一个目录，含 `meta.json`、`notes.md`、`extracted.txt` 与原始文件。
+
+> **Agent 强制检索规则**：当任务涉及“我找到的资料 / PPT / 演讲 / 论文 / 外部参考 / 某份材料里怎么说”，或需要为技术结论补充外部线索时，**必须先检索资料库**：
+> ```bash
+> python3 tools/materials.py search "<关键词，可中英文>"
+> ```
+> 命中后读 `materials/<type>/<id>/notes.md`（结论与页码）与 `extracted.txt`（原文）。**禁止**在未检索的情况下回答“没有相关资料”。
+
+- 人类总览：[`materials/INDEX.md`](./materials/INDEX.md)（自动生成，勿手改）
+- 机器索引：[`materials/catalog.json`](./materials/catalog.json)（Agent 检索入口）
+- 归档规范、元数据 Schema、四步流程：[`materials/README.md`](./materials/README.md)
+- 检索工作流 Skill：[`.agents/skills/materials-lookup/SKILL.md`](./.agents/skills/materials-lookup/SKILL.md)
+- **证据等级**：资料默认为 `secondary`，可用于背景、观点、假设与线索；架构/兼容性结论仍以固定 SHA 源码与 105 篇权威集为准。引用时标注 `[材料] 标题，路径，p.N`。
+- **新增资料**：按 README 落盘 → `python3 tools/materials.py extract <id>` → `index` → `verify`。
+
+---
+
 ## 协作者与 Agent 克隆指引（Git Submodules）
 
 本工作区通过 `.gitmodules` 声明并锁定了核心第三方源码仓库（6 大基线 + 2026-10 新增的 TorchTPU），作为只读审查与证据追踪的锚点。
@@ -72,6 +91,7 @@ git submodule update --init --recursive
 | **Google TPU / XLA** | XLA 编译管线、PJRT C ABI、tpu-inference 适配、Shape Bucketing | `13-tpu/` (20260903-130 ~ 135) | `google/third_party/tpu-inference/tpu_inference/` |
 | **跨 Backend 选型与决策** | 架构差异对比、选型决策矩阵、硬件抽象与接入分期 | `14-decisions/` (20260903-140 ~ 144) | 跨模块对比 |
 | **证据审查与增量复核** | 源码 SHA provenance、质询记录、审查遗留风险、增量 Commit 影响复核 | `15-evidence-review/`<br>`00-meta/agent-research-contract.md` | 本地 Git 工具与 claim 索引 |
+| **外部资料 / PPT / 论文** | 用户收集资料的检索、引用、归档与待核验项 | `materials/`（非权威集，secondary） | `materials/<type>/<id>/` |
 
 ---
 
@@ -84,6 +104,11 @@ python3 tools/verify_research.py
 
 # 候选影响扫描：比对指定仓库 commit diff 并匹配受影响 Claim（增量复核）
 python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7b39e99b00af363a89d1fb81 --target HEAD
+
+# 资料库：重建索引 / 全文检索 / 校验
+python3 tools/materials.py index
+python3 tools/materials.py search "EPLB 负载均衡"
+python3 tools/materials.py verify
 ```
 
 ---
@@ -118,7 +143,12 @@ python3 tools/review_changes.py --repo third_party/vllm --base bb363db9a5ec2edc7
 │   ├── 15-evidence-review/              #   - 源码 SHA 索引与证据审查
 │   └── legacy/                          #   - 早期草稿（已被 supersede，仅供追溯）
 ├── analysis-design/                     # 历史分析设计文档与运行时接口参考（过渡补充）
-├── tools/                               # 本地轻量静态校验与增量变更复核脚本
+├── materials/                           # 【用户资料库】PPT/论文/博客等外部资料 + 自动索引
+│   ├── INDEX.md                         #   - 自动生成资料总览（勿手改）
+│   ├── catalog.json                     #   - 机器可读索引（Agent 检索入口）
+│   ├── slides/ papers/ blogs/ datasets/ #   - 按资料类型归档
+│   └── _inbox/                          #   - 待整理临时落盘区
+├── tools/                               # 本地校验、变更复核与资料库索引/检索脚本
 │
 ├── third_party/                         # 【通用第三方框架，Submodule 管理】
 │   └── vllm/                            #   - 上游 vLLM (SHA: bb363db9)
