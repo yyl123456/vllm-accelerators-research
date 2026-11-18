@@ -211,7 +211,7 @@ X_i: [T,H]（复制）
 | 段 | C++ 的具体处理 | 融合/执行边界 |
 |---|---|---|
 | QKV 投影 | `rmo.matmul` 合法化为 MO；匹配常量权重转置时，`MatmulTranspBPattern` 将其编码为 NK layout / `transpose_b=true`；注册表将 `mo.matmul` 解析到 accelerator `MatmulGPU` | QKV 合并已由 `StackedLinear` 表达；CUDA 不走该 C++ pattern 的 CPU prepacking 路径 |
-| Q/K norm、split/reshape/concat | composite 可保留专用实现或分解为 reduction/elementwise；MAP 按结构融合，并处理符合条件的 view | Qwen `multiply_before_cast=False` 必须保留；不能直接套用 Gemma 风格 GEMV+partial RMSNorm pattern |
+| Q/K norm、split/reshape/concat | 当前公开树普通 RMSNorm 分解后生成 rowwise Mojo kernel；目标若注册专用实现则保留；MAP 按结构融合，并处理符合条件的 view | Qwen `multiply_before_cast=False` 必须保留；不能直接套用 Gemma 风格 GEMV+partial RMSNorm pattern |
 | RoPE / KV store / attention | custom op 依 `symbol` 查询已注册 Mojo kernel；`MOToMAP` 下降为 opaque kernel 调用并保留 chain | 当前 paged MHA 的 Q/输出没有 `Fused` 标记，通用 MAP prologue/epilogue 不把周围算术自动并入其内部 |
 | sigmoid gate | MAP elementwise/view fusion 可整理 sigmoid、multiply、reshape | 最终 kernel 边界须看 dump；普通 `MatmulGPU` 输入不带 `Fused`，不能由此宣称 gate 吸收到 O GEMM prologue |
 | O 投影 | 与 QKV 一样走普通 GPU matmul lowering；输出是每卡的 `[T,H]` 部分和 | 当前 GEMM 输入无通用 `Fused` 接口；其输出有 epilogue 接口，但下游 all-reduce 是通信，不能按普通逐元素 epilogue 理解 |
@@ -237,6 +237,28 @@ Qwen3.5 的 `X + allreduce_output → RMSNorm` 拓扑符合该模式的结构入
 融合后的注册符号为 `mo.composite.distributed.allreduce_add_rms_norm_quant_fp8`，Mojo execute 调 `allreduce_residual_rmsnorm`；输入/输出 dtype 相同时关闭量化。底层按 payload、设备数、dtype、列宽、P2P 和 scratch 选择 Lamport、一阶段或两阶段；无 P2P 时回退为普通 all-reduce 加单独 normalization。因此一个 composite IR op 并不承诺只发一个 kernel，也不证明 GEMM 与通信 overlap。
 
 证据：`max/kernels/src/graph_compiler/builtin_kernels/distributed.mojo:L1172-L1205,L1318-L1337`；`max/kernels/src/comm/allreduce_residual_rmsnorm.mojo:L1439-L1465,L1499-L1559,L2111-L2146,L2223-L2253`。本节没有指定设备上的编译 IR 或 profile，最终 launch 数、融合收益和通信重叠程度均未测。
+
+### 6.2 QKV、Q/K norm 与重排最终用哪种 Mojo kernel
+
+**C++ 的 IR 下降与 Mojo kernel 执行是同一条链上的不同阶段。** 前述“规范化 GEMM”“下降为 reduction/elementwise/view”描述编译期处理，不能理解成这些计算由 C++ 在运行时逐元素执行。
+
+| 部分 | 当前公开源码路径的 kernel 来源 | 精确边界 |
+|---|---|---|
+| 未量化 QKV 投影 | 手写 Mojo GPU GEMM：`mo.matmul` → `MatmulGPU.execute` → `linalg.matmul` → GPU dispatch | Python 的 `StackedLinear` 合并权重后调用一次 linear；这里用 GPU GEMM 实现，不要求一个叫 Qwen3.5-QKV 的独有 kernel |
+| 普通 Q/K RMSNorm | 编译器生成 rowwise Mojo kernel | Python 发出 `mo.composite.reduce.rms_norm`；没有目标专用注册时分解，再经 MAP reduction/elementwise fusion 与 Mojo codegen |
+| slice/reshape/transpose/concat | view、融合后的索引计算，或剩余数据搬运计算 | 不能把每个 Python graph op 等同于一个手写 kernel 或一次 launch；具体消除/融合结果需编译 IR |
+
+普通 RMSNorm 的实现变化由提交 [`35a95e43d60718ca837054f4d9af49dbfab38a93`](https://github.com/modular/modular/commit/35a95e43d60718ca837054f4d9af49dbfab38a93) 引入：删除普通 RMSNorm 的手写 kernel 及注册，使用“分解 → 融合 → 生成 rowwise kernel”的路径。当前 `rowwise_normalization.mojo:L41-L43` 也明确写明 plain RMSNorm 由 graph compiler 从组成部分生成。目标若自己注册 RMSNorm kernel，`hasKernel` 检查会跳过分解；不能由公开树默认路径断言所有私有/插件 kernel 包均相同。
+
+可核查的端到端证据：
+
+- QKV GEMM：`max/kernels/src/graph_compiler/builtin_kernels/linalg.mojo:L364-L388,L475-L496`，`max/kernels/src/linalg/matmul/gpu/__init__.mojo:L1110-L1156`。
+- Q/K 普通 norm 的构图：`max/python/max/pipelines/architectures/qwen3_5/layers/attention.py:L114-L128,L418-L426` → `max/python/max/nn/legacy/norm/rms_norm.py:L85-L94` → `max/python/max/graph/ops/rms_norm.py:L142-L153`。
+- 分解条件及算术：`GraphCompiler/lib/MODialect/Transforms/TmpDecomposeComposites.cpp:L126-L151,L158-L193`；fusion 入口：`GraphCompiler/lib/MAPDialect/Transforms/FuseKernels.cpp:L46-L55`。
+- 生成 Mojo row body：`GraphCompiler/lib/MOGGDialect/MOGGOpsEmitters.cpp:L1604-L1614,L1660-L1699`；生成代码调用的 Mojo primitive：`max/kernels/src/graph_compiler/builtin_primitives/primitives.mojo:L2458-L2525`，后者按 target 选择 SIMD width 并 launch Row API body。
+- 重排 lowering：`GraphCompiler/lib/Conversion/MOToMAP/MOToMAP.cpp:L815-L820,L849-L864`；连续 view 的融合另见第 5.2 节。
+
+仓库还保留其他手写 normalization、融合 QK norm/RoPE/store 等实现，但“存在该实现”不能证明当前 Qwen3.5 full-attention 调用了它。此模型明确分别调用普通 `q_norm`、`k_norm`，之后才重排并发出 cache RoPE custom op。证据：`max/python/max/pipelines/architectures/qwen3_5/layers/attention.py:L418-L477,L479-L528`。
 
 ## 7. Gated DeltaNet：另一条必须审查的路径
 
