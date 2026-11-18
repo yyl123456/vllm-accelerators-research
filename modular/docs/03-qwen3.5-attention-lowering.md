@@ -260,6 +260,26 @@ Qwen3.5 的 `X + allreduce_output → RMSNorm` 拓扑符合该模式的结构入
 
 仓库还保留其他手写 normalization、融合 QK norm/RoPE/store 等实现，但“存在该实现”不能证明当前 Qwen3.5 full-attention 调用了它。此模型明确分别调用普通 `q_norm`、`k_norm`，之后才重排并发出 cache RoPE custom op。证据：`max/python/max/pipelines/architectures/qwen3_5/layers/attention.py:L418-L477,L479-L528`。
 
+### 6.3 是否所有 IR 节点最终都走 Mojo
+
+**模型数值计算的主线是手写或生成的 Mojo kernel；融合不是进入 Mojo 的前提。但整个模型执行程序包含不下降为 Mojo 的 runtime primitive，也有编译期消失的节点。** 官方架构约束 C3 明确规定 kernel language 为 Mojo，同时明确不禁止 C++ runtime primitive（`GraphCompiler/docs/ArchitectureSpecification.md:L888-L892`）。
+
+| 范围 | 是否经 Mojo | 本轮可证实边界 |
+|---|---|---|
+| QKV/O GEMM、生成的 RMSNorm、FlashAttention 等数值 kernel | 主线是 Mojo，融合与未融合都可以 | 参见第 6.1/6.2 节；这不保证一个 graph op 就是一次 launch |
+| 常量折叠、消除的 view/重复计算等 | 对应节点可在编译期消失，不产生独立 runtime kernel | 不能将“没有独立 Mojo kernel”理解为运行时改由 C++ 做同一份张量计算 |
+| 某些 MGP runtime 节点 | 明确保留为非 Mojo lowering 路径 | `LowerPrimitives` 跳过 external constant，以及 `BufferCacheOp`、`RuntimeCreateOp`、`ModuleLoadOp`、`ExecuteGenericOp` |
+| GraphRT/MGP runtime primitive | 有直接的 C++ 实现 | 例如 runtime 创建、buffer cache、stream 选择、generic execute、list 操作；具体哪些出现在某模型产物中需看 MEF/IR |
+| Vendor BLAS 路径 | Mojo wrapper 调外部库，真正 GEMM 由厂商库实现 | 这是“经过 Mojo 包装，但计算主体非 Mojo 实现”，不能算完全绕过 Mojo 入口 |
+
+非 Mojo lowering 的直接证据：`GraphCompiler/lib/Conversion/MOGGToMGP/LowerPrimitives.cpp:L173-L190`。C++ 注册与执行证据：`GraphCompiler/lib/MGPDialect/Primitives/MGPPrimitives.cpp:L714-L757,L764-L790,L797-L813`。其中 `mgp.runtime.create` 创建/获取 execution engine，`mgp.buffer.cache` 将 buffer 存入 state slot；这些不是张量数值 kernel。
+
+GraphRT 文档明确描述 primitive 可由 C++ 函数实现并按名称注册（`MLRT/docs/GraphRT/DefiningPrimitives.md:L1-L15`）；`loadMGPMEFFile` 注册 GraphRT/MGP primitives 并安装到 MEF（`GraphCompiler/lib/MEFModel/MEFModel.cpp:L918-L925`）。
+
+Vendor GEMM 的证据为 `max/kernels/src/linalg/matmul/vendor/blas.mojo:L14-L23,L26-L46,L717-L750`：包含 cuBLAS/cuBLASLt/rocBLAS/hipBLASLt wrapper，并调用 `cublasGemmEx` 等外部 API。普通 GPU GEMM 的 `MODULE_USE_VENDOR_BLAS` 分派开关见 `max/kernels/src/linalg/matmul/gpu/__init__.mojo:L1110-L1122`；本轮没有证据表明具体 Qwen3.5 运行启用了它。
+
+不可将上述边界扩大为“内存分配、copy、同步一律不经过 Mojo”。例如 `BufferAllocOp` 本身实现了 `emitMojo`，可生成对相应 primitive 的调用（`GraphCompiler/lib/MGPDialect/Dialect/MGPDeviceOps.cpp:L197-L213`）。必须区分：图节点是否生成 Mojo、调用者是否为 Mojo、最终执行主体是否为外部库或 C++ runtime。
+
 ## 7. Gated DeltaNet：另一条必须审查的路径
 
 ```text
