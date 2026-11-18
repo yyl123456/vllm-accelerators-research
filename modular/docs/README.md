@@ -3,18 +3,23 @@
 > **资料角色声明**：
 > 本目录归档 Modular Platform（MAX 推理栈 + Mojo 语言）的源码级调研。
 > 与华为/高通/Google 等"vLLM 后端插件"不同，Modular 是**自带图编译器与运行时的独立推理栈**，是路线 A（AOT 图编译）在 vLLM 生态之外的直接对照样本。
-> **固定源码 Revision**：`modular/third_party/modular/` 当前为 `da0db31d422e19ad5952d8d106b6da1d6899cf0a`（2026-10-23，Mojo 1.3.0.dev / MAX 26.8.0.dev）。
+> **固定源码 Revision**：`modular/third_party/modular/` 当前为 `bbc13a719b6c139ede763f1434a4342ebfd843ac`（2026-11-17，Mojo 1.3.0.dev2026111705 / MAX 26.8.0.dev2026111705；2026-11-18 更新）。旧专题保留各自固定 SHA。
 
 ---
 
 ## 官方路线侧重与成熟度说明
 
-- **AOT 图编译 + 预编译产物缓存路线（官方唯一交付主线，侧重程度：★★★★★）**：
+- **图编译 + MEF 产物路线（Serving 主线，侧重程度：★★★★★）**：
   - MAX 的 Serving 路径固定为：Python 框架/管线构图 → `GraphCompiler` 优化并 lowering → 生成 **MEF** 产物 → `MLRT/GraphRT` 加载执行；MEF 缓存命中时跳过编译（`GraphCompiler/docs/ArchitectureSpecification.md`，QA-S2）。
   - 运行时通过 `SDK/include/HAL/M_driver_*.h` 的 C ABI 对接 `Target/` 下的 CUDA/HIP/Metal 插件，与 QAIC 的 AOT 交付形态、TPU 的 XLA 编译缓存属同一类工程结构。
-- **动态/即时路径（辅助，侧重程度：★★☆☆☆）**：
+  - “AOT 图编译”不等于所有 kernel 都预先交付：当前管线包含 `JitCompileKernels`，cache miss 后进行 Mojo/KGEN elaboration 与 LLVM archive 编译（`GraphCompiler/lib/GraphCompiler.cpp:L613-L625`）。
+- **编译后 capture/replay（主线的补充，侧重程度：★★★★☆）**：
+  - Qwen3.5 注册 `supports_device_graph_capture=True`（`max/python/max/pipelines/architectures/qwen3_5/arch.py:L56-L63`），与图编译组合使用。
+- **独立逐算子 eager（辅助，侧重程度：★★☆☆☆）**：
   - 保留 eager 与自定义算子路径（规范中 QA-E1 要求 custom ops 在 eager 与 compiled 两种模式下均可用），但不是服务化交付主干。
-- **闭源边界**：Mach 产品层、合作方 HAL 插件、部分打包流程不开源；MAX 主体代码为 **source-available（MAX License）**，仅 Mojo 与 `rust_kv` 等为 Apache-2.0 + LLVM Exception。
+- **闭源边界**：Mach 产品层、合作方 HAL 插件、部分打包流程及 `kda_chunk` kernel 不在公开源码树内；公开文件按文件头区分 MAX License 与 Apache-2.0 + LLVM Exception。`kda_chunk` 的 Python wrapper 与回退 gate 可审阅，内部 kernel 为 UNKNOWN。
+
+星级表示源码路径的侧重，不代表设备性能或生产验证等级；本目录本轮新增结论均为 `STATIC_REVIEWED`。
 
 ---
 
@@ -24,6 +29,7 @@
 |---|---|---|---|
 | 01 | [Prefix KV Cache 的 Jenga 块池机制](01-modular-prefix-kv-cache-jenga.md) | 混合 KV 类型下的碎片化治理：LCM 几何对齐、Parked/Claimed 状态机、跨 Cache 征用 | `e700d92f` |
 | 02 | [MAX 源码开放增量盘点（2026-10-22）](02-max-source-available-2026-10.md) | 新开放的 GraphCompiler / MLRT / Driver / HAL SDK / rust_kv，许可证边界与闭源缺口 | `da0db31d` |
+| 03 | [Qwen3.5 Attention 的 lowering、融合与硬件分派](03-qwen3.5-attention-lowering.md) | 显式 paged FlashAttention、MAP 结构融合、partial RoPE / FP8 KV、Gated DeltaNet chunk gate 与闭源边界 | `bbc13a71` |
 
 ---
 
