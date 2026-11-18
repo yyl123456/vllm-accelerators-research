@@ -181,6 +181,63 @@ RMSNorm 是 composite：若库中没有实现它的 kernel，`TmpDecomposeCompos
 - 该 pair-CTA kernel 使用相邻两个 SM 协作，专门安排 softmax、correction、MMA、TMA load warp；depth=256 的几何为 MMA_M=256、BM=128、BN=128。证据：`max/kernels/src/nn/attention/gpu/nvidia/sm100/mha_depth512/kernel.mojo:L13-L28`。这类布局和流水是手写 Mojo 实现的显式选择，不能全归因于图编译器自动优化。
 - 新的 paged MHA wrapper 对满足条件的 NVIDIA mixed step 可依据 split record，将 decode rows 与 prefill rows 作为两个 view 分派并写入同一输出；无有效 split 或存在不满足条件的 operand 时保留单路。证据：`max/kernels/src/graph_compiler/builtin_kernels/attention.mojo:L4230-L4236,L4365-L4435`。
 
+### 6.1 从 QKV 到 O 投影、AllReduce 的 C++ 处理
+
+本节限定**未量化 BF16 GPU GEMM、TP 多卡、Qwen3.5 full-attention block**；量化投影可产生不同 custom op，不能直接套用普通 `mo.matmul` 的接口结论。源码基线与日期同第 1 节，证据仍为静态审查。
+
+#### 进入 C++ 前已明确的 TP 数据流
+
+设 `T` 为本步总 token 数、`H` 为 hidden size，设备 `i` 的 attention head 展平宽度为 `D_i`。各卡输入 X 复制；本卡 Q（含 gate）、K、V 按 head 切分；本卡 O 权重存储形状为 `[H,D_i]`。数学关系为：
+
+```text
+X_i: [T,H]（复制）
+ → input RMSNorm
+ → GEMM_QKV_i（本卡 heads；Q 投影同时产生 gate）
+ → Q/K RMSNorm、partial RoPE、paged KV store
+ → paged FlashAttention_i → A_i: [T,D_i]
+ → Z_i = A_i * sigmoid(G_i)
+ → P_i = Z_i @ W_O_i.T : [T,H]（本卡部分和）
+跨卡：Y_i = sum_j(P_j) : [T,H]
+ → R_i = X_i + Y_i
+ → post-attention RMSNorm(R_i) → MLP
+```
+
+头切分、gamma 复制和 O 的输入维切分在 Python 中就指定了：`max/python/max/pipelines/architectures/qwen3_5/layers/attention.py:L192-L220,L251-L279`。`Qwen3_5FullAttentionBlock.__call__` 在每卡 shard 的 O 投影返回后显式 `self.allreduce`，再 residual add 与 post-attention norm：`max/python/max/pipelines/architectures/qwen3_5/qwen3_5.py:L196-L228`。
+
+`Allreduce.__call__` 调 `ops.allreduce.sum`；后者合并设备 chain，创建跨所有输入设备的 `mo.distributed.allreduce.sum`，再更新各设备 chain。因此通信位置与参与者是图中显式信息。证据：`max/python/max/nn/legacy/comm/allreduce.py:L69-L85`；`max/python/max/graph/ops/allreduce.py:L89-L111`。
+
+#### C++ 按段下降和优化
+
+| 段 | C++ 的具体处理 | 融合/执行边界 |
+|---|---|---|
+| QKV 投影 | `rmo.matmul` 合法化为 MO；匹配常量权重转置时，`MatmulTranspBPattern` 将其编码为 NK layout / `transpose_b=true`；注册表将 `mo.matmul` 解析到 accelerator `MatmulGPU` | QKV 合并已由 `StackedLinear` 表达；CUDA 不走该 C++ pattern 的 CPU prepacking 路径 |
+| Q/K norm、split/reshape/concat | composite 可保留专用实现或分解为 reduction/elementwise；MAP 按结构融合，并处理符合条件的 view | Qwen `multiply_before_cast=False` 必须保留；不能直接套用 Gemma 风格 GEMV+partial RMSNorm pattern |
+| RoPE / KV store / attention | custom op 依 `symbol` 查询已注册 Mojo kernel；`MOToMAP` 下降为 opaque kernel 调用并保留 chain | 当前 paged MHA 的 Q/输出没有 `Fused` 标记，通用 MAP prologue/epilogue 不把周围算术自动并入其内部 |
+| sigmoid gate | MAP elementwise/view fusion 可整理 sigmoid、multiply、reshape | 最终 kernel 边界须看 dump；普通 `MatmulGPU` 输入不带 `Fused`，不能由此宣称 gate 吸收到 O GEMM prologue |
+| O 投影 | 与 QKV 一样走普通 GPU matmul lowering；输出是每卡的 `[T,H]` 部分和 | 当前 GEMM 输入无通用 `Fused` 接口；其输出有 epilogue 接口，但下游 all-reduce 是通信，不能按普通逐元素 epilogue 理解 |
+| all-reduce 与后处理 | `PatternFusion` 专门查找 all-reduce → residual add → RMSNorm，可加满足条件的 FP8 quantize；替换成 composite，再下降到 Mojo 通信实现 | O GEMM 仍是该通信 composite 的输入生产者；该模式没有把 O GEMM 或前面的 attention 收进去 |
+
+源码锚点：
+
+- `GraphCompiler/lib/MODialect/Patterns/Fusion.cpp:L348-L363,L444-L502`：GPU 不做该 prepacking，权重转置布局处理。
+- `GraphCompiler/lib/MOGGDialect/Analysis/Support.cpp:L22-L74`：custom 按 symbol、builtin 按 op 名查询，并按 device 解析 kernel。
+- `max/kernels/src/graph_compiler/builtin_kernels/linalg.mojo:L364-L388,L475-L496`：GPU GEMM 的 fused-output/plain-output overload；两种输入均不带 `Fused`。kernel 进一步调用 `linalg.matmul`，SM100/SM90 等分派在 Mojo 内进行（`max/kernels/src/linalg/matmul/gpu/__init__.mojo:L1110-L1156`）。
+- `GraphCompiler/lib/Conversion/MOToMAP/MOToMAP.cpp:L142-L162,L219-L243`：以参数契约决定是否创建可融合 prologue/epilogue。
+
+#### AllReduce 融合不是笼统的“整个 attention 融合”
+
+`PatternFusionPass` 主动调用 `applyFuseAllReduceAddRMSNormQuantFP8`，并支持 bundled/parallel 形式。匹配器找到每张卡上 `allreduce_output` 位于 RHS 的 residual add、其后的 RMSNorm，检查 GPU、rank、dtype、group 与 norm 属性，再构造 `AllReduceAddRMSNormQuantFP8Op`。它保留 normalized output 和 residual output，供后续 MLP 及 residual 支路使用。证据：`GraphCompiler/lib/MODialect/Transforms/PatternFusion.cpp:L48-L66`；`GraphCompiler/lib/MODialect/Patterns/Fusion.cpp:L1326-L1356,L1386-L1420,L1440-L1515,L1520-L1534`。
+
+Qwen3.5 的 `X + allreduce_output → RMSNorm` 拓扑符合该模式的结构入口，但是否在具体构建、dtype、设备数与 pipeline options 下实际命中，仍须 IR dump。注意：
+
+- 普通无量化路径允许 cast-first RMSNorm，要求 norm 输出 dtype 与 all-reduce 输入相同。
+- 若要额外折入 FP8 quantize，要求其 per-token/整行 scale、没有 amax floor，且 norm 为 `multiply_before_cast=True`。本模型 norm factory 为 False，因此不能将其概括为必定融合 FP8 量化。证据：`Fusion.cpp:L1386-L1420`（完整路径同上）；`max/python/max/pipelines/architectures/qwen3_5/qwen3_5.py:L382-L402`。
+- 参与设备必须都匹配同一类链路，epsilon、weight offset、cast 顺序必须一致；独立 subgroup 不走此 distributed composite。证据：`GraphCompiler/lib/MODialect/Patterns/Fusion.cpp:L1440-L1465`。
+
+融合后的注册符号为 `mo.composite.distributed.allreduce_add_rms_norm_quant_fp8`，Mojo execute 调 `allreduce_residual_rmsnorm`；输入/输出 dtype 相同时关闭量化。底层按 payload、设备数、dtype、列宽、P2P 和 scratch 选择 Lamport、一阶段或两阶段；无 P2P 时回退为普通 all-reduce 加单独 normalization。因此一个 composite IR op 并不承诺只发一个 kernel，也不证明 GEMM 与通信 overlap。
+
+证据：`max/kernels/src/graph_compiler/builtin_kernels/distributed.mojo:L1172-L1205,L1318-L1337`；`max/kernels/src/comm/allreduce_residual_rmsnorm.mojo:L1439-L1465,L1499-L1559,L2111-L2146,L2223-L2253`。本节没有指定设备上的编译 IR 或 profile，最终 launch 数、融合收益和通信重叠程度均未测。
+
 ## 7. Gated DeltaNet：另一条必须审查的路径
 
 ```text
