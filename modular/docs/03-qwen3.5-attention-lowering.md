@@ -112,6 +112,27 @@ mo.graph @qwen3_5(tokens, row_offsets, kv_pages, recurrent_state, ...) {
 
 **第 574 行是组装 pass pipeline 的位置。** `buildMoPipeline` 等函数把 pass 加到 `PassManager`；`runGCPipeline` 的 `pm.run(moduleOp)` 才实际执行改写。证据：`GraphCompiler/lib/GraphCompiler.cpp:L640-L656`。图编译前 attention 大算子已由 Python 选择；C++ 将其连接到已注册 kernel 并处理可允许的结构融合，kernel 的数值实现仍在 Mojo 源码或对应库中。
 
+#### 交接粒度：完整 Module，内部可以包含层子图
+
+常规 Qwen3.5 Serving 编译传入的是**该编译组的完整 MLIR Module**：有完整 decoder 顶层图，以及它调用的层子图定义。`Module` 是交接/编译容器；`Graph` 和层 subgraph 是容器内部的组织层次，二者不矛盾。
+
+- `use_subgraphs` 默认 True（`max/python/max/pipelines/lib/config/model_config.py:L742-L749`），并传到 Qwen3.5 配置（`max/python/max/pipelines/architectures/qwen3_5/model_config.py:L975-L983`）。模型将 full-attention 层和 linear-attention 层分成两组，分别命名 `qwen3_5_full_attention_block`、`qwen3_5_linear_attention_block`（`max/python/max/pipelines/architectures/qwen3_5/qwen3_5.py:L681-L716`）。这些是 transformer block 子图，包含 attention、MLP 与 norm，不仅是 attention 算子（同文件 `L117-L160`）。
+- `forward_sequential_layers` 为每组的第一层构建一个子图，后续层在顶层图中通过 `ops.call` 复用，传各层输入和权重 prefix。关闭子图时，直接逐层调用构图；编译交接仍是完整 Module。证据：`max/python/max/nn/legacy/transformer/transformer.py:L145-L190`；权重 placeholder/prefix 约定见 `max/python/max/nn/legacy/layer/layer.py:L315-L356`。
+- 子图通过 `Graph.current.add_subgraph` 创建，并指定 `module=self.module`，所以定义与调用者属于同一个 Module。证据：`max/python/max/graph/graph.py:L1084-L1099`。这不是 Python 每层单独调用一次 C++ compile。
+- 文本 checkpoint 的组只有 decoder；有 vision encoder 时，`qwen3_5_vision` 与 decoder 使用相同 `_COMPILE_GROUP`，常规 Serving 一起 trace 到一个 GraphModule 再 compile。证据：`max/python/max/pipelines/architectures/qwen3_5/model.py:L91-L92,L239-L253,L661-L697`；`max/python/max/pipelines/lib/graph_specs.py:L247-L286`。
+- `max export` 的 `compile_roles_separately` 可以忽略上述组，将 decoder/vision 各自编译；这仍按模型 role 分开，不是把每层分别传入。证据：`max/python/max/pipelines/lib/graph_specs.py:L190-L211`。
+
+默认文本路径的组织示意（非实际 IR dump）：
+
+```text
+Module                    ← 整个交给 C++
+ ├─ graph @qwen3_5         ← embedding → 按层 call → final norm / logits
+ ├─ subgraph @qwen3_5_full_attention_block
+ └─ subgraph @qwen3_5_linear_attention_block
+```
+
+这里“完整 decoder 图”指一次 forward 的全部层与数据依赖，不等于把多轮生成的调度流程全部收进图；也不能由此推断编译器必定做跨层融合。融合还受 subgraph/call、kernel 接口和具体 pass 约束。
+
 实际管线见 `GraphCompiler/lib/GraphCompiler.cpp:L574-L625`：
 
 ```text

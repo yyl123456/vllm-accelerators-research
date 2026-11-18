@@ -29,7 +29,7 @@
 |---|---|---|---|
 | 01 | [Prefix KV Cache 的 Jenga 块池机制](01-modular-prefix-kv-cache-jenga.md) | 混合 KV 类型下的碎片化治理：LCM 几何对齐、Parked/Claimed 状态机、跨 Cache 征用 | `e700d92f` |
 | 02 | [MAX 源码开放增量盘点（2026-10-22）](02-max-source-available-2026-10.md) | 新开放的 GraphCompiler / MLRT / Driver / HAL SDK / rust_kv，许可证边界与闭源缺口 | `da0db31d` |
-| 03 | [Qwen3.5 Attention 的 lowering、融合与硬件分派](03-qwen3.5-attention-lowering.md) | Python→MLIR→C++ 交接、显式 paged FlashAttention、MAP 结构融合、partial RoPE / FP8 KV、Gated DeltaNet chunk gate 与闭源边界 | `bbc13a71` |
+| 03 | [Qwen3.5 Attention 的 lowering、融合与硬件分派](03-qwen3.5-attention-lowering.md) | Python→MLIR→C++ 交接与整图/层子图粒度、显式 paged FlashAttention、MAP 结构融合、partial RoPE / FP8 KV、Gated DeltaNet chunk gate 与闭源边界 | `bbc13a71` |
 
 ---
 
