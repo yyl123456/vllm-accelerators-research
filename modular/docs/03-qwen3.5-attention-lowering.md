@@ -63,6 +63,55 @@ x
 
 ## 5. 算子 lowering：编译器具体做什么
 
+### 5.0 Python 到 C++ 编译管线的交接形式（2026-11-18 补充）
+
+**进入第 574 行所组织的编译管线时，输入已经是内存中的 MLIR `ModuleOp`，其中包含 Qwen3.5 的 `mo.graph`、RMO/MO 算子、类型与依赖。** Python Graph API 在构图时就通过原生绑定创建 MLIR 对象；“Python 阶段 / C++ pipeline 阶段”是职责边界，不表示此前从未执行 C++ 绑定。
+
+```text
+Qwen3_5 Python Module + 输入类型 / 权重注册
+ → GraphSpec.trace → Qwen3_5.trace
+ → 使用 Graph 输入的符号 Value 调用 forward / __call__，创建 RMO/MO 图
+ → module.mlir_module._CAPIPtr（原生 ModuleOp 句柄）
+ → C++ MOFContext.compileToBinary：取回并 clone ModuleOp
+ → runGCPipeline：组装 passes → pm.run(moduleOp)
+ → MGP / 编译 kernel → MEF
+```
+
+构图行为可直接核查：
+
+- `max/python/max/pipelines/lib/graph_specs.py:L144-L163` 调模型的 trace；`max/python/max/pipelines/architectures/qwen3_5/qwen3_5.py:L769-L818` 把平坦的符号输入重组为 tokens、attention cache、recurrent state 等，再进入模型调用。
+- `max/python/max/graph/graph.py:L912-L937` 创建 `builtin.ModuleOp`、`mo.GraphOp` 与输入参数；`L979-L993` 用 `self.inputs` 调 `forward` 并登记 outputs。这里图输入是符号 Value，实际请求的 tokens/cache 内容在执行时绑定。
+- `max/python/max/graph/ops/matmul.py:L103-L111` 把 matmul 创建成 `rmo.MatmulOp` 并设置结果 dtype；`max/python/max/graph/ops/custom.py:L173-L208` 创建 `mo.custom`，写入 symbol、parameters、device，以及更新有副作用操作的 chain。
+
+因此，一个 attention 层在此时已有“投影、norm、重排、custom RoPE、custom paged attention、gate、输出投影”的**张量级依赖结构**。每个值可携带 shape（含符号维）、dtype 和 device；KV/SSM 是可变 buffer，读写顺序用 chain 表达。大算子保留注册符号；尚未全部展开为 GPU 指令。
+
+以下仅示意图结构，不是本轮编译得到的 IR，也不是可直接运行的 MLIR：
+
+```text
+mo.graph @qwen3_5(tokens, row_offsets, kv_pages, recurrent_state, ...) {
+  qkv       = rmo.matmul(x, stacked_weight_transposed)
+  q, k, v   = split / reshape / norm / partial-RoPE-layout(qkv)
+  q, chain  = mo.custom[symbol="kv_cache.fused_qk_rope.ragged.paged"](...)
+  a, chain  = mo.custom[symbol="attention.mha.ragged.paged"](...)
+  gated     = multiply(reshape(a), sigmoid(gate))
+  out       = rmo.matmul(gated, output_weight_transposed)
+}
+```
+
+交接处没有要求先序列化成文件：`max/python/max/engine/api.py:L1344-L1351` 直接传 `_CAPIPtr`；`max/python/max/_core/max_license/lib/Engine/InferenceSession.cpp:L654-L676` 将 capsule 中指针写入 `ModelSource`；`max/lib/max_license/API/c/CompiledModels.cpp:L100-L119` 调 `compileToBinary`；`GraphCompiler/lib/FrameworkFrontend/FrameworkFrontend.cpp:L378-L386` 以 `ModuleOp::getFromOpaquePointer(source).clone()` 恢复并复制模块。
+
+| C++ 管线阶段 | 对图做的事 | 输出的抽象层次 |
+|---|---|---|
+| MO pipeline | 注册/校验 kernel，RMO 合法化，shape、常量、代数与 composite pattern 优化 | 规范化后的张量算子图 |
+| MO → MAP，MAP fusion | 将算子表示为 elementwise / rowwise / opaque kernel，合并允许的计算与 view | 选定接口及融合边界的 kernel 图 |
+| MAP → MOGG | 下降融合区域，整理 kernel 调用、参数与代码生成例程 | 面向代码生成的图 |
+| MOGG → MGP，MGP pipeline | 显式 buffer、内存复用/规划、init 与 execute 的不变计算移动、依赖与设备图处理 | 面向 runtime 的程序 |
+| EmitMojo / JitCompileKernels / 导出 | 生成并编译 Mojo/KGEN kernel/glue，导出 MEF | 可加载的执行产物 |
+
+阶段证据：`GraphCompiler/lib/GraphCompiler.cpp:L221-L262,L326-L397,L574-L625`；`GraphCompiler/lib/FrameworkFrontend/FrameworkFrontend.cpp:L356-L375`。具体选择受 options、kernel 注册和目标设备约束，缓存命中可以跳过编译。
+
+**第 574 行是组装 pass pipeline 的位置。** `buildMoPipeline` 等函数把 pass 加到 `PassManager`；`runGCPipeline` 的 `pm.run(moduleOp)` 才实际执行改写。证据：`GraphCompiler/lib/GraphCompiler.cpp:L640-L656`。图编译前 attention 大算子已由 Python 选择；C++ 将其连接到已注册 kernel 并处理可允许的结构融合，kernel 的数值实现仍在 Mojo 源码或对应库中。
+
 实际管线见 `GraphCompiler/lib/GraphCompiler.cpp:L574-L625`：
 
 ```text
