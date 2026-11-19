@@ -69,6 +69,12 @@ Builder -> create_builder_config
 
 `api_usage.py:L49-L93` 展示 min/opt/max profiles、GPU compute capability 和 `STRIP_PLAN`/`REFIT`。特别注意该高级示例默认显式选择 `CURRENT`，会缩小至当前 GPU；源码注释给出的跨 RTX 默认目标，不应套用到已选择 `CURRENT` 的实例。序列化 Engine 也受 TensorRT-RTX 版本限制，见 `hello_world.py:L119-L128`。
 
+**编译边界：整模型、子图还是大算子？** 一次原生 Builder 调用以传入的 `INetworkDefinition` 网络图为单位，而该网络图在上层应用中可以是完整模型，也可以仅是一个子模块。`hello_world.py:L48-L86,L155-L156` 把 FC1 → ReLU → FC2 整张网络一次交给 Builder；这不是按单个矩阵乘分别调用 Builder。
+
+FLUX.2 是明确的子模块例子：`flux2_pipeline.py:L294-L300` 配置 `require_full_compilation=True`，注释要求把**整个 transformer** 编译成一个 TensorRT-RTX Engine；`L514-L546` 只 export 并替换 `self.pipe.transformer`。因此，相对 transformer 它是整图，相对整个图像生成管线它是一个子图；text encoder、scheduler、VAE 留在该 Engine 外。
+
+模型边界、Engine 边界和 Kernel 融合边界是不同问题。一个 Engine 不等于单个 CUDA Kernel，也不能把其称为必然的全模型 Megakernel。具体内部融合分组、kernel 数量及 AOT/JIT 间优化 pass 的精确划分在闭源 SDK 中，本次为 `UNKNOWN`。原生 ONNX 路径要求提交图中的算子均受支持；不能假定 Builder 自动切出不支持部分并退回 PyTorch。其他框架的分图策略应另行核查对应集成实现。
+
 ### 4.3 Runtime：加载 Engine、建立 Context
 
 `hello_world.py:L162-L180`：
