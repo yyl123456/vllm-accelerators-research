@@ -12,6 +12,15 @@
 
 **成熟度研究评级：★★★☆☆**。依据是已发布 SDK、C++/Python API、动态形状与真实模型示例；本工作区仅做静态核查，未安装 SDK、未在 GPU 上验证，因此不作生产就绪或性能承诺。
 
+## 首次公开发布的时间
+
+2026-11-19 核对 Git 历史、GitHub API 与官方发布博文：
+
+- 官方首次宣布产品的博文标注 **2025-05-19**，说明通过 Windows ML 预览提供，并计划 6 月交付独立 SDK。[官方宣布](https://developer.nvidia.com/blog/nvidia-tensorrt-for-rtx-introduces-an-optimized-inference-ai-library-on-windows/)。
+- GitHub 首个 Release `v1.0.0.21` 的 `published_at` 为 `2025-06-11T22:39:38Z`，即 **北京时间 2025-06-12 06:39:38**。[首个 Release](https://github.com/NVIDIA/TensorRT-RTX/releases/tag/v1.0.0.21)。本地根提交为 `15c2f47fa59230e8971e70073432061796d30cbf`，标题 `TensorRT-RTX 1.0 Release`。
+- 官方 **2025-06-12** 发布博文明确宣布 SDK 可下载，同时提供 GitHub API samples/demos。[官方首发说明](https://developer.nvidia.com/blog/?p=101673)。这里的开源对象是配套示例和 Demo，不表示核心 SDK 全部开源。
+- GitHub 仓库 `created_at` 为 `2025-06-05T19:55:09Z`；创建时间和 Git commit 时间均不能单独证明最早转为公开的时刻。已核查的 Release 与正式博文支持以 **2025 年 6 月中旬** 作为公开发布节点。
+
 ## 本地源码与复现
 
 | 仓库 | 本地目录 | 本次固定 SHA | 交付边界 |
