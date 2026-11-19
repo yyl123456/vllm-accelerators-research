@@ -1,9 +1,67 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-25",
+  "generated_at": "2026-11-19",
   "root": "materials",
-  "count": 1,
+  "count": 2,
   "items": [
+    {
+      "schema_version": 1,
+      "id": "2026-11-19-megakernel-boundaries",
+      "title": "MegaKernel 不是万金油：它赢在 Decode 的缝隙，也会输在 Prefill、动态调度和多节点通信",
+      "type": "blogs",
+      "status": "indexed",
+      "added": "2026-11-19",
+      "language": "zh",
+      "vendors": [
+        "NVIDIA"
+      ],
+      "topics": [
+        "MegaKernel",
+        "Decode",
+        "Prefill",
+        "CUDA Graph",
+        "设备端调度",
+        "算子融合"
+      ],
+      "source": {
+        "kind": "wechat",
+        "url": "https://mp.weixin.qq.com/s/Lj8HkN-yy4jc8tWlEgCJJw",
+        "author": "DeepPrompting",
+        "published_at": "2026-10-17T19:08:00+08:00",
+        "retrieved_at": "2026-11-19",
+        "original_filename": "original.html.gz"
+      },
+      "source_file": {
+        "path": "original.html.gz",
+        "sha256": "041b24b8a51213bc7249475da9af572d2cf0b43c18d9e75424a2310c1562ea04",
+        "bytes": 882967,
+        "mime": "application/gzip"
+      },
+      "derived": [
+        "article.md",
+        "extracted.txt",
+        "notes.md"
+      ],
+      "summary": "讨论 MegaKernel 减少启动、中间结果物化和同步的收益，以及设备端调度、资源专用化、多节点通信和维护成本。已核对 Ada-MK 阶段切换、Event Tensor 调度对照和 NVIDIA CUDA Graph 官方资料；其余文献数字仍为文章转述。",
+      "key_points": [
+        "Persistent 描述驻留与取任务方式，MegaKernel 描述跨阶段融合及设备端执行职责，二者不能与 CUDA Graph 混同。",
+        "Ada-MK 在指定 L20/Qwen 配置中采用 Prefill 原生算子、Decode MegaKernel 的混合路径。",
+        "动态调度收益依赖负载；比较 MegaKernel 必须包含 CUDA Graph 与局部融合基线。"
+      ],
+      "related": [
+        {
+          "path": "20260903-vllm-ai-infra-research/05-vllm-compile/20260903-52-CUDAGraph、PiecewiseCapture与Shape.md",
+          "note": "权威对应编号 52：CUDA Graph 契约"
+        },
+        {
+          "path": "20260903-vllm-ai-infra-research/05-vllm-compile/20260903-54-Eager、JIT、AoT、Trace与Replay.md",
+          "note": "权威对应编号 54：执行模式分类"
+        }
+      ],
+      "authority": "secondary",
+      "caveats": "公众号文章为二手解读；原始 HTML 使用 gzip 无损归档，正文图片保留远端链接。未进行 GPU 实测，未逐一复核全部参考文献，不增加或替代 105 篇权威结论。",
+      "path": "materials/blogs/2026-11-19-megakernel-boundaries"
+    },
     {
       "schema_version": 1,
       "id": "2026-10-25-deepinfer-talk",
