@@ -4,6 +4,7 @@
 
 ## TensorRT-RTX
 
+- [TensorRT-RTX 与 TensorRT-LLM 对比](./tensorrt-rtx-vs-tensorrt-llm.md)：模型编译执行 SDK 与请求/生成执行系统的职责差别；固定 SHA 核对当前 TRT-LLM 已移除 TensorRT Engine 后端，采用 PyTorch 原生后端。
 - [整体架构与源码阅读](./tensorrt-rtx-architecture.md)：模型入口 → AOT Builder → 可分发 Engine → 终端 JIT/ExecutionContext → CUDA 执行。§4 说明图编译边界及对象职责；§5 说明三层 JIT 复用、Runtime Cache 与 CUDA Graph；§6 说明动态形状、主机参与和内存；§7 追踪 FLUX.1 多 Engine/Python 去噪循环及 FLUX.2 子模块编译。
 - [此前的定位与开源边界核查](../../analysis-design/02-vendor-research/41-tensorrt-rtx-overview-and-source-boundary.md)。
 - 权威主题对应：[54：执行模式分类](../../20260903-vllm-ai-infra-research/05-vllm-compile/20260903-54-Eager、JIT、AoT、Trace与Replay.md)、[52：图捕获与 Shape](../../20260903-vllm-ai-infra-research/05-vllm-compile/20260903-52-CUDAGraph、PiecewiseCapture与Shape.md)。主题对应不表示固定 vLLM Claim 已覆盖 TensorRT-RTX。
