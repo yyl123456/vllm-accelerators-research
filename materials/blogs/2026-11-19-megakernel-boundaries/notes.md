@@ -3,7 +3,7 @@
 - 调研日期：2026-11-19（Asia/Shanghai）。
 - [材料] DeepPrompting《MegaKernel 不是万金油》，[原文](https://mp.weixin.qq.com/s/Lj8HkN-yy4jc8tWlEgCJJw)，2026-10-17；网页无页码，按章节定位。
 - 材料路径：`materials/blogs/2026-11-19-megakernel-boundaries/`；[正文](article.md)、[可检索全文](extracted.txt)、[原始 HTML 无损压缩归档](original.html.gz)。
-- 源码基线：vLLM `bb363db9a5ec2edc7b39e99b00af363a89d1fb81`，只读核对 CUDA Graph 路径，未审查 MegaKernel 项目实现。
+- 源码基线：vLLM `bb363db9a5ec2edc7b39e99b00af363a89d1fb81` 核对 CUDA Graph 路径。各 MegaKernel 实例的证据版本见[开发方式与 AI 的角色](#开发方式与-ai-的角色)。
 - 权威对应编号：[52：CUDA Graph、Piecewise Capture 与 Shape](../../../20260903-vllm-ai-infra-research/05-vllm-compile/20260903-52-CUDAGraph、PiecewiseCapture与Shape.md)、[54：执行模式分类](../../../20260903-vllm-ai-infra-research/05-vllm-compile/20260903-54-Eager、JIT、AoT、Trace与Replay.md)。本笔记属于 secondary 资料解读，不进入 105 篇权威集。
 
 ## 核心观点与执行链路
@@ -51,6 +51,24 @@
 
 本次完成网页阅读、一手文献对照及 vLLM Graph 路径的静态核对，没有性能实测、数值验证或硬件成熟度认证。Ada-MK 所述生产部署是作者报告；生产部署内部实现、线上流量及未公开细节为 UNKNOWN。
 
-文章关于 RaMP、AutoMegaKernel、Perseus 与 Mirage/Triton/XLA issue 的各项数字未逐项核验。不得将其中的固定 batch、特定 GPU 或 weak-scaling 结果直接套到当前 vLLM 服务。
+文章关于 RaMP、AutoMegaKernel、Perseus 与 Mirage/Triton/XLA issue 的性能数字未逐项核验。不得将其中的固定 batch、特定 GPU 或 weak-scaling 结果直接套到当前 vLLM 服务。
 
 评估建议属于 RECOMMENDATION：在同精度、同模型、同工作负载下比较 Eager、Graph、局部融合加 Graph 和 MegaKernel，分别看 Prefill、Decode、端到端延迟及吞吐；不要只比较 kernel 数量。
+
+## 开发方式与 AI 的角色
+
+开发工作的核心是把一段模型计算拆成 GPU 执行的任务，明确每个任务读取哪些数据、在哪执行、何时能开始。一个执行链示例是将 Decode 的 MLP 中间结果切成块。每块生产完更新自己的计数器，下游 down projection 在所需分块就绪后开始对应的部分计算。多个任务由同一个 GPU kernel 执行。这个例子来自 [Hazy Research 的 Llama-1B 实现说明](https://hazyresearch.stanford.edu/blog/2025-05-27-no-bubbles)，见 Synchronization 小节。
+
+| 路线 | 工程师提供 | 工具生成或选择 |
+|---|---|---|
+| Hazy Research 手写执行器 | 用 CUDA 模板写 RMSNorm/QKV/RoPE 等设备端操作，设计共享内存管理和计数器依赖 | Python 预先为 GPU 的 SM 排好指令序列，设备端解释器执行 |
+| Mirage MPK 编译生成 | 提供张量程序和任务实现所需的算子支持 | 编译器构建 SM 粒度任务图和设备代码，由 kernel 内 runtime 派发。见 [MPK v1 §4–5](https://arxiv.org/html/2512.22219v1#S4) |
+| Ada-MK 离线搜索 | 定义分解、约束和目标硬件配置 | 编译阶段建 DAG 并结合实测选择执行顺序。运行时由 TensorRT-LLM 插件调用该路径。见 [Ada-MK v1 §4.2–4.3](https://arxiv.org/html/2605.11581v1#S4.SS2) |
+| AutoMegaKernel 的 AI 辅助 | 提供微内核、lowering、验证器和性能测试 | Coding agent 提议分块、融合范围、SM 分配或预取深度等候选。程序生成并静态检查任务图，再做数值对照和 GPU 测速。见 [AutoMegaKernel v1 §4–5](https://arxiv.org/html/2606.09682v1#S4) |
+
+固定源码锚点：
+
+- HazyResearch/Megakernels `7309cec801537b61fea3b50d7dfe454a6cde578e`，[`demos/low-latency-llama/llama.cuh:L7-L13`](https://github.com/HazyResearch/Megakernels/blob/7309cec801537b61fea3b50d7dfe454a6cde578e/demos/low-latency-llama/llama.cuh#L7-L13) 定义 Llama 操作的指令码。
+- RightNow-AI/AutoMegaKernel `884534c4d2dbed4381576f81a79ae97feca53c34`，[`schedule/ir.py:L393-L414`](https://github.com/RightNow-AI/AutoMegaKernel/blob/884534c4d2dbed4381576f81a79ae97feca53c34/schedule/ir.py#L393-L414) 定义 `ScheduleConfig` 及搜索参数，[`schedule/ir.py:L847-L856`](https://github.com/RightNow-AI/AutoMegaKernel/blob/884534c4d2dbed4381576f81a79ae97feca53c34/schedule/ir.py#L847-L856) 记录 `validate()` 的检查边界。
+
+“自动生成”可以由编译器和搜索完成。AI 在 AMK 的调优环中提出候选，离线测量选出方案，线上请求执行生成的 CUDA。验证器检查其任务图模型内的依赖、等待条件等，模型输出还须对照参考实现。Hazy Research 和 AMK 提供公开代码，Mirage 与 Ada-MK 在这里引用论文设计。Ada-MK 的生产实现细节仍为 UNKNOWN。本次为源码和文献静态核对，未运行硬件基准。

@@ -21,7 +21,9 @@
         "Prefill",
         "CUDA Graph",
         "设备端调度",
-        "算子融合"
+        "算子融合",
+        "自动调优",
+        "AutoMegaKernel"
       ],
       "source": {
         "kind": "wechat",
@@ -46,7 +48,8 @@
       "key_points": [
         "Persistent 描述驻留与取任务方式，MegaKernel 描述跨阶段融合及设备端执行职责，二者不能与 CUDA Graph 混同。",
         "Ada-MK 在指定 L20/Qwen 配置中采用 Prefill 原生算子、Decode MegaKernel 的混合路径。",
-        "动态调度收益依赖负载；比较 MegaKernel 必须包含 CUDA Graph 与局部融合基线。"
+        "动态调度收益依赖负载；比较 MegaKernel 必须包含 CUDA Graph 与局部融合基线。",
+        "开发笔记对照手写执行器、编译生成、离线搜索和 AutoMegaKernel 的 AI 辅助调优。"
       ],
       "related": [
         {
