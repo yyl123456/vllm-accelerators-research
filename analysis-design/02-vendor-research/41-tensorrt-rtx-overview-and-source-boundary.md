@@ -46,3 +46,7 @@ TensorRT-RTX 与 TensorRT-LLM 是不同产品。官方架构文档说明，LLM �
 - [SDK 软件许可](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/reference/sla.html)：二进制软件与另附许可组件分别适用对应条款。本记录仅核对交付和开源边界，不提供个案法律意见。
 
 源码配套组件的目录与构建依赖核查为 `SOURCE_IMPLEMENTED × STATIC_REVIEWED`；编译路线与支持边界为官方文档契约，未升级为设备实测证明。
+
+## 5. 本地克隆后的进一步阅读
+
+2026-11-19 已将同一 SHA 克隆至 `nvidia/third_party/TensorRT-RTX/`。端到端 API 调用、动态形状、缓存、内存及真实模型管线，见 [NVIDIA 导航](../../nvidia/docs/README.md) 与 [TensorRT-RTX 整体架构解读](../../nvidia/docs/tensorrt-rtx-architecture.md)。
