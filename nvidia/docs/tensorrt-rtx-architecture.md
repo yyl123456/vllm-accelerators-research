@@ -41,8 +41,9 @@ flowchart TD
     G --> H[RuntimeConfig 与 ExecutionContext]
     I[Runtime Cache：JIT 编译产物] <--> H
     H --> J[终端 GPU JIT 与形状专门化]
-    J --> K[CUDA Stream 上执行]
-    K --> L[可选 CUDA Graph 捕获与重放]
+    J --> K[可执行的 GPU 工作]
+    K --> L[普通 Stream 提交]
+    K --> M[可选 CUDA Graph 捕获与重放]
 ```
 
 这是公开接口的逻辑分层，不是闭源 SDK 内部模块图。JIT 工作分布在执行上下文创建及后续推理阶段，尤其是动态形状首次出现时；不能将所有编译固定理解为只发生在 `create_execution_context` 或只发生在首个 enqueue。
@@ -69,6 +70,8 @@ Builder -> create_builder_config
 
 `api_usage.py:L49-L93` 展示 min/opt/max profiles、GPU compute capability 和 `STRIP_PLAN`/`REFIT`。特别注意该高级示例默认显式选择 `CURRENT`，会缩小至当前 GPU；源码注释给出的跨 RTX 默认目标，不应套用到已选择 `CURRENT` 的实例。序列化 Engine 也受 TensorRT-RTX 版本限制，见 `hello_world.py:L119-L128`。
 
+**纯 CPU AOT 有配置边界**：官方 [CPU-Only AOT and TensorRT-RTX Engines](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/cpu-engines.html) 明示默认构建可不依赖 GPU，显式 CC 列表也可纯 CPU 构建；`CURRENT`/`--useGpu` 则需要 GPU。该页面另外规定 weight-stripping/refit 构建需要 GPU、最多一个 CC 目标。因此“支持 CPU-only AOT”不等于所有构建配置都无需 GPU。此处是当日 `latest` 契约，未做 SDK 设备验证。
+
 **编译边界：整模型、子图还是大算子？** 一次原生 Builder 调用以传入的 `INetworkDefinition` 网络图为单位，而该网络图在上层应用中可以是完整模型，也可以仅是一个子模块。`hello_world.py:L48-L86,L155-L156` 把 FC1 → ReLU → FC2 整张网络一次交给 Builder；这不是按单个矩阵乘分别调用 Builder。
 
 FLUX.2 是明确的子模块例子：`flux2_pipeline.py:L294-L300` 配置 `require_full_compilation=True`，注释要求把**整个 transformer** 编译成一个 TensorRT-RTX Engine；`L514-L546` 只 export 并替换 `self.pipe.transformer`。因此，相对 transformer 它是整图，相对整个图像生成管线它是一个子图；text encoder、scheduler、VAE 留在该 Engine 外。
@@ -86,6 +89,16 @@ Runtime -> deserialize_cuda_engine -> ICudaEngine
 ```
 
 `ICudaEngine` 提供编译后的模型和 I/O 元信息，`IExecutionContext` 保存推理所需的运行状态。官方 `How TensorRT-RTX Works / Threading` 允许共享 Engine，但一个 context 不能被多线程同时使用；应用应为并发执行使用独立 context。此处为公开契约，未读取二进制内部线程实现。
+
+对象的职责与存续阶段应分开理解：
+
+| 对象 | 职责与生命周期证据 |
+| --- | --- |
+| `Builder` / `INetworkDefinition` / `IBuilderConfig` | 构建期的网络与配置；输出序列化 Engine 后不必继续保留这一套构建对象。源码 `hello_world.py:L129-L158`；对象销毁规则见官方 Object Lifetimes。 |
+| `IRuntime` / `ICudaEngine` | Runtime 负责反序列化；Engine 是后续创建 context 的模型执行对象，持有 I/O、profile、权重相关信息。入口 `hello_world.py:L162-L180`。 |
+| `IRuntimeConfig` | 为 context 选择编译缓存、shape-specialization、graph、内存分配策略。入口 `api_usage.py:L350-L378`。 |
+| `IExecutionContext` | 本次执行所需的 shape、激活状态与相关资源；不能由多个线程同时使用。 |
+| CUDA stream / 应用 I/O buffer | 应用选择执行 stream、分配并绑定 I/O 地址；`execute_async_v3` 返回只表示已提交，完成由 stream/event 同步确认。入口 `hello_world.py:L184-L227`。 |
 
 ### 4.4 执行：绑定地址并提交 CUDA Stream
 
@@ -105,6 +118,26 @@ Runtime Cache 不是 KV Cache，也不是序列化 Engine。`Engine.activate` �
 
 官方 runtime-cache 契约要求 GPU、SDK 版本、driver 与 CiG 状态满足兼容性条件；不兼容时忽略缓存并重新 JIT。具体检查逻辑在闭源 SDK，代码级实现为 `UNKNOWN`。官方 CUDA Graph 文档说明原生 API 默认关闭，CLI 默认可不同；本示例显式开启，不应宣传为所有入口一律默认开启。
 
+### 5.1 JIT 内部复用层次与持久化缓存不是同一分类
+
+官方 [Dynamic Shapes: Advanced Topics / Advanced](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/dynamic-shapes-advanced.html#advanced) 描述三层复用；这是公开设计契约，不是本地可读的源码实现：
+
+| 层次 | 官方描述的用途 |
+| --- | --- |
+| Layer-level | 复用已经见过的 shape 对应的 layer 内存表示。 |
+| Kernel-level | 对新的 shape，若既有 kernel 也能高效运行，则准备相应 metadata 并复用，避免重新编译。 |
+| Selection-level | 专用 kernel 不可直接复用时，使用 context 创建时准备的 subgraph fallback，推理过程中按策略后台生成专用 kernel。 |
+
+这三层解释“运行时怎样复用计算实现”；Runtime Cache 的序列化 API 解释“哪些已编译产物可以跨进程运行保存”。不能把三层都等同于三种磁盘缓存，或把“新 shape”一律解释为重新编译整图。官方同时指出部分层/精度组合的跨 shape kernel 复用受限，不能保证每次都命中。
+
+### 5.2 CUDA Graph 的实际边界
+
+`api_usage.py:L350-L378` 在同一个 runtime config 上同时设置 Runtime Cache 和 CUDA Graph，然后创建一个 context，直接证明二者可组合。
+
+当前官方 RTX CUDA Graph 文档规定：第一次推理留给初始化，后续再捕获、重放；API 默认关闭，CLI 默认开启。启用后也不保证每次采用图执行：默认 stream、已有外部 capture、数据依赖形状/控制流、执行期 weight streaming 等情况存在限制。捕获失败可回到普通执行路径。这些是 TensorRT-RTX 当前集成的边界，不能推广为 CUDA Graph 机制本身永久不支持某类节点。
+
+因此模型图编译、GPU kernel 专门化、GPU 调用图重放分别处理模型语义、设备执行实现与重复提交成本；它们不是三次重新编译相同模型，也不是互斥的三条路线。
+
 ## 6. 动态形状与内存
 
 - **动态 shape 有 profile 范围**：构建时用 `-1` 和 min/opt/max，运行时选 profile、`set_input_shape`，随后提交。入口为 `api_usage.py:L49-L58,L107-L109,L210-L223`。
@@ -113,9 +146,33 @@ Runtime Cache 不是 KV Cache，也不是序列化 Engine。`Engine.activate` �
 - **顺序模型可复用 workspace**：`demo/utils/pipeline.py:L220-L279` 按多个 Engine 的最大需求分配同一 buffer 并交给各 context。该示例不构成允许多个 context 并发读写同一 workspace 的证明。
 - **权重可独立补装**：`api_usage.py:L88-L93,L333-L346` 构建剥离权重、可 refit 的 Engine，部署时用 `Refitter.set_named_weights` 与 `refit_cuda_engine` 补入权重；这是权重交付选项，不表示消除了推理时的权重内存需求。
 
+还有一个影响“整图是否能一次提交”的运行时事实：官方 `Dynamic Shapes: Advanced Topics / Execution Tensors vs Shape Tensors` 描述了 shape 计算的 CPU/GPU 交替处理。CPU 先计算已知形状；若后续形状依赖 GPU 结果，则先提交 GPU 工作，必要时同步后返回 CPU 计算形状。某些被当作 execution tensor 的形状数据还会引入 GPU → CPU 拷贝。这说明“编译过整张网络”不保证执行时没有主机参与，也不保证能捕获为一个静态 CUDA Graph。这里仅采用官方契约，没有推演内部调度源码。
+
+内存还需区分三类：权重、context 的内部 activation/scratch、应用 I/O buffer。Runtime Cache 不保存这些输入输出数据；CUDA Graph 也不替代应用对 buffer 生命周期的管理。Demo 的 `managed_weights.py:L4-L25` 则是另一层应用级优化：在不同管线阶段间恢复/卸载 Engine 权重，使用 pinned host buffer 或 VMM 物理块池。这种阶段级 offload 不应与 SDK 的执行期 weight streaming 混称为同一实现。
+
 ## 7. 真实模型层如何组织
 
 `demo/utils/Engine` 将 build、load、activate、allocate_buffers、infer、deactivate 分开；上层 `Pipeline` 组织多个模型的加载、workspace 与运行顺序。FLUX.2 示例只将 transformer 替换为编译后的模块，text encoder、scheduler、VAE 仍按其 README 所述运行于 PyTorch。
+
+### 7.1 FLUX.1：多个 Engine 组成完整应用
+
+`demo/flux1.dev/pipelines/flux_pipeline.py:L131-L171` 明确列出四个角色：CLIP、T5、transformer、VAE decoder；`L471-L497` 按角色准备 Engine 并激活。完整调用可从 `infer` 的 `L988-L1032` 追踪：
+
+```text
+tokenize + T5 Engine / CLIP Engine
+    -> 初始化 latents
+    -> Python 去噪循环：Transformer Engine -> scheduler.step -> 下一步
+    -> VAE decoder Engine
+    -> 后处理 / 图像
+```
+
+`L865-L900` 中的 `for` 循环每步调用 `run_engine("transformer", params)`，随后由 `self.scheduler.step(...)` 更新 latents。它不是把整个多步图像生成应用一次交给 Builder。按公开代码能够确认的是“多个编译网络 + 应用侧流程控制”；内部一个 transformer Engine 又使用多少 kernel，则未核查到闭源实现。
+
+### 7.2 模型构建与交付也有应用侧状态
+
+`demo/flux1.dev/flux_native_builder.py:L89-L145` 的原生 weightless 路径记录 checkpoint、precision、shape/profile、TensorRT 版本和构建源码 identity，配置 `REFIT_INDIVIDUAL`、`STRIP_PLAN` 后调用 Builder。`L120-L126` 检查这些身份及 plan 的 SHA256，决定是否复用已有 Engine。这是 Demo 的构建缓存策略，不等于闭源 runtime 的所有兼容性规则。
+
+应用级 pipeline、Engine 封装和 SDK 核心应分别研究：前两层控制模型下载、构建产物、模型间数据流与资源生命周期；SDK 核心实现网络优化、JIT 和执行。不能从 GitHub 的 `demo/utils/Engine` 类名推断它就是 SDK 内部 `ICudaEngine` 的实现。
 
 因此整体可理解为：**上层管线控制模型流程，开源封装管理资源与缓存，闭源 SDK 完成 AOT/JIT 与执行，CUDA 提供底层 stream 和 GPU 运行能力。** 公共仓库不是 LLM 请求调度器或完整 serving 集群控制平面。
 
@@ -137,3 +194,5 @@ Runtime Cache 不是 KV Cache，也不是序列化 Engine。`Engine.activate` �
 - [Working with Runtime Cache](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-runtime-cache.html)：编译缓存与兼容性。
 - [Working with RTX CUDA Graphs](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-cuda-graphs.html)：可选捕获与重放。
 - [Working with Dynamic Shapes](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/work-with-dynamic-shapes.html)：profiles 与运行时 shape。
+- [Dynamic Shapes: Advanced Topics](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/dynamic-shapes-advanced.html)：三层复用、shape tensor 与执行期主机参与。
+- [CPU-Only AOT and TensorRT-RTX Engines](https://docs.nvidia.com/deeplearning/tensorrt-rtx/latest/inference-library/cpu-engines.html)：CPU 构建边界、weightless/refit 与权重装卸。
